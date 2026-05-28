@@ -19,7 +19,7 @@ Il sistema consente la gestione completa della libreria musicale, la creazione d
 
 ```bash
 # Clona la repository
-git clone https://github.com/your-repo/vibeflow.git
+git clone https://github.com/Luigii11/SAD_Gruppo6.git
 cd vibeflow
 
 # Compila il progetto
