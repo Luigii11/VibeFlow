@@ -13,5 +13,5 @@ package it.unisa.diem.sad_gruppo6.commands;
 
 public interface AppCommand 
 {
-    void execute();   
+    void execute();  
 }
