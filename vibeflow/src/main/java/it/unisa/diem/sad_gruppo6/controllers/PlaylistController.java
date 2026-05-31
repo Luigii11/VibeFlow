@@ -12,12 +12,12 @@ public class PlaylistController {
     private PlaylistLibrary playlistLibrary;
     //private CommandManager commandManager;
 
-    // Metodo Costruttore
+    /* Metodo Costruttore
     public PlaylistController (TrackLibrary trackLibrary, PlaylistLibrary playlistLibrary, CommandManager commandManager) {
-        //this.trackLibrary = trackLibrary;
+        this.trackLibrary = trackLibrary;
         this.playlistLibrary = playlistLibrary;
-        //this.commandManager = commandManager;
-    }
+        this.commandManager = commandManager;
+    }*/
 
     // Metodo per Creazione Playlist dall'utente
     public void createPlaylist(String name) throws IllegalArgumentException {
@@ -31,7 +31,7 @@ public class PlaylistController {
             throw new IllegalArgumentException("Esiste già una playlist con questo nome.");
         }
 
-        Playlist newPlaylist = new Playlist(name, false);
+        Playlist newPlaylist = new Playlist(name.trim(), false);
         playlistLibrary.addPlaylist(newPlaylist);
     }
 

@@ -1,7 +1,7 @@
 package it.unisa.diem.sad_gruppo6.models;
 
-import java.util.List;
-import java.util.ArrayList;
+//import java.util.List;
+//import java.util.ArrayList;
 
 public class Playlist {
     // Attributi
