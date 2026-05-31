@@ -19,9 +19,9 @@ public class PlaylistCreationDialogController {
     private Button saveButton;
 
     // Riferimento al controller
-    private PlaylistController playlistController;
+    private PlaylistControllerTest playlistController;
 
-    public void setPlaylistController(PlaylistController controller) {
+    public void setPlaylistController(PlaylistControllerTest controller) {
         this.playlistController = controller;
     }
 
