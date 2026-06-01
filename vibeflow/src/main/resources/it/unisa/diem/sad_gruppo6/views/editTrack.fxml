@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+    
+<!--
+    editTrack.fxml
+    Vista "Modifica Traccia".
+    Mostra un form pre-popolato con i metadati della traccia selezionata.
+    L'utente può modificare i campi e confermare. La validazione avviene
+    nel controller; in caso di errore viene mostrato un messaggio.
+    Controller: TrackController
+-->
+<VBox alignment="CENTER" spacing="15"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="it.unisa.diem.sad_gruppo6.controllers.TrackController">
+
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <Label text="Modifica Traccia" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+
+    <TextField fx:id="titleField"    promptText="Titolo"/>
+    <TextField fx:id="authorField"   promptText="Autore"/>
+    <TextField fx:id="durationField" promptText="Durata (secondi)"/>
+    <TextField fx:id="genreField"    promptText="Genere"/>
+    <TextField fx:id="yearField"     promptText="Anno"/>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Annulla" onAction="#handleBack"/>
+        <Button text="Salva"   onAction="#handleEditTrack"
+                style="-fx-background-color: #4a90d9; -fx-text-fill: white; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <Label fx:id="feedbackLabel" style="-fx-text-fill: green;"/>
+
+</VBox>

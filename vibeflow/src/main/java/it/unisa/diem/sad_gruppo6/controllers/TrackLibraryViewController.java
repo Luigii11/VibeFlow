@@ -23,6 +23,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -73,11 +74,23 @@ public class TrackLibraryViewController implements Initializable, TrackLibraryOb
                 private final Label lblGenre = makeCellLabel(GENRE);
                 private final Label lblAuthor = makeCellLabel(AUTHOR);
                 private final Label lblDuration = makeCellLabel(DURATION);
-                private final HBox content = new HBox(lblTitle, lblGenre, lblAuthor, lblDuration);
+                private final Button btnEdit = new Button("✏");
+                private final HBox content = new HBox(lblTitle, lblGenre, lblAuthor, lblDuration, btnEdit);
+
                 {
                     setStyle("-fx-padding: 6 16 6 16;");
                     setText(null);
+                    HBox.setHgrow(lblTitle, javafx.scene.layout.Priority.NEVER);
+
+                    btnEdit.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 13px;");
+                    btnEdit.setOnAction(event -> {
+                        Track track = getItem();
+                        if (track != null) {
+                            handleEditButtonClick(track, event);
+                        }
+                    });
                 }
+
                 @Override
                 protected void updateItem(Track track, boolean empty) {
                     super.updateItem(track, empty);
@@ -152,5 +165,35 @@ public class TrackLibraryViewController implements Initializable, TrackLibraryOb
             label.setMaxWidth(width);
             label.setStyle("-fx-font-size: 13px;");
             return label;
+        }
+
+        /**
+         * Apre la vista di modifica traccia pre-popolando il form con i metadati
+         * della traccia selezionata.
+         * Carica {@code editTrack.fxml}, ottiene il relativo {@link TrackController}
+         * tramite il FXMLLoader e invoca {@link TrackController#setTrackToEdit(Track)}
+         * prima di mostrare la scena.
+         *
+         * @param track la traccia selezionata dalla lista su cui premere il bottone matita.
+         * @param event l'evento di azione generato dal click sul pulsante modifica.
+         */
+        private void handleEditButtonClick(Track track, javafx.event.ActionEvent event) {
+            try {
+                FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/it/unisa/diem/sad_gruppo6/views/editTrack.fxml")
+                );
+                Parent root = loader.load();
+
+                // Ottiene il controller della nuova vista e pre-popola il form
+                TrackController trackController = loader.getController();
+                trackController.setTrackToEdit(track);
+
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.show();
+            } catch (IOException e) {
+                System.err.println("Errore nel caricamento di editTrack.fxml: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
 }
