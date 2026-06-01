@@ -10,7 +10,6 @@
 package it.unisa.diem.sad_gruppo6.controllers;
 
 import it.unisa.diem.sad_gruppo6.models.*;
-import it.unisa.diem.sad_gruppo6.commands.*;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
