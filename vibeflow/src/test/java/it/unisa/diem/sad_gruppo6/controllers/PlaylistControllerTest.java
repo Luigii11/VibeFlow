@@ -32,8 +32,8 @@ public class PlaylistControllerTest {
     @BeforeEach
     public void setUp() {
         testTrackLibrary = TrackLibrary.getInstance();
-        
-        testLibrary = new PlaylistLibrary();
+        testLibrary = PlaylistLibrary.getInstance();
+        testLibrary.clear();
         testCommandManager = new CommandManager();
 
         testController = new PlaylistController(testTrackLibrary, testLibrary, testCommandManager);

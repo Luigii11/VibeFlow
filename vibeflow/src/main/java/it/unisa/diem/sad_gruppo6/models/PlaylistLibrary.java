@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class PlaylistLibrary {
 
     // Attributi
+    private static PlaylistLibrary instance;
     private List<Playlist> playlists;
     private List<PlaylistLibraryObserver> observers;
 
@@ -19,9 +20,20 @@ public class PlaylistLibrary {
      * Costruttore classe 'PlaylistLibrary'.
      * Inizializza la lista vuota delle playlist e la lista degli observer.
      */
-    public PlaylistLibrary() {
+    private PlaylistLibrary() {
         this.playlists = new ArrayList<>();
         this.observers = new ArrayList<>();
+    }
+
+    /**
+     * @pattern Singleton
+     * @return L'istanza unica e globale di PlaylistLibrary.
+     */
+    public static PlaylistLibrary getInstance() {
+        if (instance == null) {
+            instance = new PlaylistLibrary();
+        }
+        return instance;
     }
 
     // Metodi CRUD
@@ -83,6 +95,13 @@ public class PlaylistLibrary {
         return false;
     }
     
+    /**
+     * Svuota la libreria per resettare lo stato tra un test e l'altro.
+     */
+    public void clear() {
+        playlists.clear(); 
+    }
+
     // Gestione Observer
 
     /**
