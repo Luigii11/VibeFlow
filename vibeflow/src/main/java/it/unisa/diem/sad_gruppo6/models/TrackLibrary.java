@@ -136,5 +136,19 @@ public class TrackLibrary
         tracks = rebuilt;
         notifyTrackAdded(updatedTrack); 
     }
-
+    /**
+     * Rimuove una traccia dalla libreria e notifica tutti gli observer registrati.
+     *
+     * @param track la traccia da rimuovere.
+     * @throws IllegalArgumentException se {@code track} è null o non presente in libreria.
+     */
+    public void removeTrack(Track track)
+    {
+        if (track == null || !tracks.contains(track))
+        {
+            throw new IllegalArgumentException("La traccia da rimuovere non è presente in libreria.");
+        }
+        tracks.remove(track);
+        notifyObserver();
+    }
 }

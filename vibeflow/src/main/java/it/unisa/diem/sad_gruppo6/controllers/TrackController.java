@@ -75,15 +75,27 @@ public class TrackController
                 genreField.getText(),
                 Integer.parseInt(yearField.getText())
             );
-            feedbackLabel.setStyle("-fx-text-fill: green;");
-            feedbackLabel.setText("Traccia aggiunta!");
+            // feedbackLabel.setStyle("-fx-text-fill: green;");
+            // feedbackLabel.setText("Traccia aggiunta!");
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/diem/sad_gruppo6/views/TrackLibraryView.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) titleField.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+
         } catch (NumberFormatException e) {
             feedbackLabel.setStyle("-fx-text-fill: red;");
             feedbackLabel.setText("Durata e anno devono essere numeri.");
         } catch (IllegalArgumentException e) {
             feedbackLabel.setStyle("-fx-text-fill: red;");
             feedbackLabel.setText(e.getMessage());
+        }catch (IOException e) { 
+            feedbackLabel.setStyle("-fx-text-fill: red;");
+            feedbackLabel.setText("Errore nel caricamento della libreria.");
+            System.err.println("Errore nel tornare alla vista TrackLibraryView: " + e.getMessage());
         }
+
     }
 
     /**
@@ -152,6 +164,7 @@ public class TrackController
 
         try
         {
+            // 1. Esegue la modifica della traccia
             editTrack(
                 trackToEdit,
                 titleField.getText(),
@@ -160,8 +173,17 @@ public class TrackController
                 genreField.getText(),
                 Integer.parseInt(yearField.getText())
             );
-            feedbackLabel.setStyle("-fx-text-fill: green;");
-            feedbackLabel.setText("Traccia modificata con successo!");
+            
+            // 2. Torna alla schermata della lista canzoni (TrackLibraryView) mostrando la modifica effettuata
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/it/unisa/diem/sad_gruppo6/views/TrackLibraryView.fxml")
+            );
+            Parent root = loader.load();
+            
+            // Prende lo stage corrente usando un qualsiasi elemento grafico presente nella view (es. titleField)
+            Stage stage = (Stage) titleField.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
         }
         catch (NumberFormatException e)
         {
@@ -172,6 +194,12 @@ public class TrackController
         {
             feedbackLabel.setStyle("-fx-text-fill: red;");
             feedbackLabel.setText(e.getMessage());
+        }
+        catch (IOException e) 
+        { 
+            feedbackLabel.setStyle("-fx-text-fill: red;");
+            feedbackLabel.setText("Errore nel tornare alla libreria.");
+            System.err.println("Errore nel tornare alla vista TrackLibraryView: " + e.getMessage());
         }
     }
 

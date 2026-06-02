@@ -1,24 +1,30 @@
 package it.unisa.diem.sad_gruppo6;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import java.io.IOException;
 
 public class App extends Application {
 
     @Override
     public void start(Stage stage) {
-        // Schermata provvisoria per non far crashare l'app all'avvio
-        Label placeholder = new Label("VibeFlow - In attesa della HomeView...");
-        StackPane root = new StackPane(placeholder);
-        
-        Scene scene = new Scene(root, 640, 480);
-        
-        stage.setTitle("VibeFlow");
-        stage.setScene(scene);
-        stage.show();
+        try {
+            // Carica la schermata corretta trovata nel progetto
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("views/TrackLibraryView.fxml"));
+            Parent root = fxmlLoader.load();
+            
+            Scene scene = new Scene(root);
+            
+            stage.setTitle("VibeFlow - Test Crea Traccia");
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            System.out.println("Errore nel caricamento del file FXML: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
