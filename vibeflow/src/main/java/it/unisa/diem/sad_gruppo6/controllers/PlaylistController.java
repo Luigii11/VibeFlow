@@ -10,10 +10,12 @@ package it.unisa.diem.sad_gruppo6.controllers;
 import it.unisa.diem.sad_gruppo6.models.Playlist;
 import it.unisa.diem.sad_gruppo6.models.PlaylistLibrary;
 import it.unisa.diem.sad_gruppo6.models.TrackLibrary;
+import it.unisa.diem.sad_gruppo6.models.Track;
 
 import it.unisa.diem.sad_gruppo6.commands.CommandManager;
 import it.unisa.diem.sad_gruppo6.commands.CreatePlaylistCommand;
 import it.unisa.diem.sad_gruppo6.commands.AppCommand;
+import it.unisa.diem.sad_gruppo6.commands.AddTrackToPlaylistCommand;
 
 public class PlaylistController {
 
@@ -82,15 +84,24 @@ public class PlaylistController {
 
     /*
     /**
-     * Aggiunge una traccia a una specifica playlist.
-     * * @param t La traccia da aggiungere.
+     * Aggiunge una traccia a una specifica playlist, verificando che non sia già presente.
+     * La playlist non ammette duplicati per la medesima traccia.
+     * 
+     * @param t La traccia da aggiungere.
      * @param p La playlist di destinazione.
+     * 
+     * @throws IllegalArgumentException Se la traccia è già presente nella playlist.
+     * 
      */
-    /*
+    
     public void addTrackToPlaylist(Track t, Playlist p) {
-
+        if(p.getTracks().contains(t)) {
+            throw new IllegalArgumentException("La traccia è già presente nella playlist.");
+        }
+        AppCommand command = new AddTrackToPlaylistCommand(p, t);
+        commandManager.execute(command);
     }
-    */
+    
 
     
     /**
