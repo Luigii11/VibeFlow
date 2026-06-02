@@ -112,4 +112,43 @@ public class TrackLibrary
                 observer.onLibraryChanged();
             }
     }
+    /**
+     * Aggiorna i metadati di una traccia esistente sostituendo {@code oldTrack}
+     * con {@code updatedTrack}, preservando l'ordine di inserimento.
+     * Poiché {@link Track#equals(Object)} si basa su titolo e autore, la
+     * sostituzione ricostruisce il LinkedHashSet per mantenere la posizione originale.
+     *
+     * @param oldTrack     la traccia originale già presente in libreria.
+     * @param updatedTrack la traccia con i nuovi metadati da sostituire.
+     * @throws IllegalArgumentException se {@code oldTrack} non è presente in libreria.
+     */
+    public void updateTrack(Track oldTrack, Track updatedTrack)
+    {
+        if (oldTrack == null || !tracks.contains(oldTrack))
+        {
+            throw new IllegalArgumentException("La traccia da aggiornare non è presente in libreria.");
+        }
+        LinkedHashSet<Track> rebuilt = new LinkedHashSet<>();
+        for (Track t : tracks)
+        {
+            rebuilt.add(t.equals(oldTrack) ? updatedTrack : t);
+        }
+        tracks = rebuilt;
+        notifyTrackAdded(updatedTrack); 
+    }
+    /**
+     * Rimuove una traccia dalla libreria e notifica tutti gli observer registrati.
+     *
+     * @param track la traccia da rimuovere.
+     * @throws IllegalArgumentException se {@code track} è null o non presente in libreria.
+     */
+    public void removeTrack(Track track)
+    {
+        if (track == null || !tracks.contains(track))
+        {
+            throw new IllegalArgumentException("La traccia da rimuovere non è presente in libreria.");
+        }
+        tracks.remove(track);
+        notifyObserver();
+    }
 }

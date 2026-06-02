@@ -5,7 +5,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
 public class App extends Application {
@@ -24,10 +23,17 @@ public class App extends Application {
         scene.setRoot(loadFXML(fxml));
     }
 
-    private static Parent loadFXML(String fxml) throws IOException {
-    FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("views/" + fxml + ".fxml"));
-    return fxmlLoader.load();
+    public static <T> T setRootAndGetController(String fxml) throws IOException {
+    FXMLLoader loader = new FXMLLoader(App.class.getResource("views/" + fxml + ".fxml"));
+    Parent root = loader.load();
+    scene.setRoot(root);              // usa la stessa scena (niente sgancio)
+    return loader.getController();    // restituisce il controller per configurarlo
 }
+
+    private static Parent loadFXML(String fxml) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("views/" + fxml + ".fxml"));
+        return fxmlLoader.load();
+    }
 
     public static void main(String[] args) {
         launch();

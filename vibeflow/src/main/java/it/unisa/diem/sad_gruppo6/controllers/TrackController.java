@@ -8,12 +8,12 @@
 package it.unisa.diem.sad_gruppo6.controllers;
 
 import it.unisa.diem.sad_gruppo6.models.*;
-import it.unisa.diem.sad_gruppo6.App;
 import it.unisa.diem.sad_gruppo6.commands.*;
+import it.unisa.diem.sad_gruppo6.App;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
-
 import java.io.IOException;
 
 public class TrackController 
@@ -27,27 +27,13 @@ public class TrackController
     @FXML private TextField genreField;
     @FXML private TextField yearField;
     @FXML private Label feedbackLabel;
-    /**
-     * Costruttore del TrackController, inizializza la libreria delle tracce e il gestore dei comandi.
-     * 
-     * @param library la libreria delle tracce da gestire.
-     * @param commandManager il gestore dei comandi per eseguire azioni sulla libreria delle tracce.
-     */
+    private Track trackToEdit;   // NON @FXML: non arriva da un nodo dell'FXML
+
     public TrackController() 
     {
         this.library = TrackLibrary.getInstance();
         this.commandManager = new CommandManager();
     }
-
-    /**
-     * Metodo per creare una nuova traccia e aggiungerla alla libreria, utilizzando un comando per incapsulare l'azione.
-     * 
-     * @param title Il titolo della traccia da creare.
-     * @param author L'autore della traccia da creare.
-     * @param duration La durata della traccia da creare in secondi.
-     * @param genre Il genere musicale della traccia da creare.
-     * @param year L'anno di pubblicazione della traccia da creare.
-     */
 
     public void createTrack(String title, String author, int duration, String genre, int year) 
     {
@@ -61,15 +47,14 @@ public class TrackController
     {
         try 
         {
-            createTrack
-            (
+            createTrack(
                 titleField.getText(),
                 authorField.getText(),
                 Integer.parseInt(durationField.getText()),
                 genreField.getText(),
                 Integer.parseInt(yearField.getText())
             );
-            App.setRoot("TrackLibraryView");   // torna alla libreria, sulla STESSA scena
+            App.setRoot("TrackLibraryView");
         } 
         catch (NumberFormatException e) 
         {
@@ -88,6 +73,68 @@ public class TrackController
         }
     }
 
+    public void editTrack(Track target, String title, String author, int duration, String genre, int year)
+    {
+        Track updatedTrack = new Track(title, author, duration, genre, year);
+        EditTrackCommand command = new EditTrackCommand(target, updatedTrack);
+        commandManager.execute(command);
+    }
 
+    public void setTrackToEdit(Track track)
+    {
+        this.trackToEdit = track;
+        titleField.setText(track.getTitle());
+        authorField.setText(track.getAuthor());
+        durationField.setText(String.valueOf(track.getDuration()));
+        genreField.setText(track.getGenre());
+        yearField.setText(String.valueOf(track.getYear()));
+    }   
 
+    @FXML
+    private void handleEditTrack()
+    {
+        if (trackToEdit == null) return;
+
+        try
+        {
+            editTrack(
+                trackToEdit,
+                titleField.getText(),
+                authorField.getText(),
+                Integer.parseInt(durationField.getText()),
+                genreField.getText(),
+                Integer.parseInt(yearField.getText())
+            );
+            App.setRoot("TrackLibraryView");
+        }
+        catch (NumberFormatException e)
+        {
+            feedbackLabel.setStyle("-fx-text-fill: red;");
+            feedbackLabel.setText("Durata e anno devono essere numeri.");
+        }
+        catch (IllegalArgumentException e)
+        {
+            feedbackLabel.setStyle("-fx-text-fill: red;");
+            feedbackLabel.setText(e.getMessage());
+        }
+        catch (IOException e) 
+        { 
+            feedbackLabel.setStyle("-fx-text-fill: red;");
+            feedbackLabel.setText("Errore nel tornare alla libreria.");
+        }
+    }
+
+    @FXML
+    private void handleBack(ActionEvent event)
+    {
+        try
+        {
+            App.setRoot("TrackLibraryView");
+        }
+        catch (IOException e)
+        {
+            feedbackLabel.setStyle("-fx-text-fill: red;");
+            feedbackLabel.setText("Errore nel tornare alla libreria.");
+        }
+    }
 }
