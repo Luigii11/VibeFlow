@@ -69,14 +69,19 @@ public class Playlist {
     /* // Metodi di gestione delle tracce
     
     /**
-     * Aggiunge una traccia alla playlist.
+     * Aggiunge una traccia alla playlist solo se non è già presente.
+     * Il controllo dei duplicati si basa sul metodo equals() della classe 'Track', 
+     * che confronta titolo e autore.
+     * 
      * * @param t La traccia da aggiungere.
      */
-    /*
+    
     public void addTrack(Track t) {
-        
+        if (!tracks.contains(t)) {
+            tracks.add(t);
+        }
     }
-    */
+    
 
     /**
      * Rimuove una traccia dalla playlist.
@@ -98,4 +103,13 @@ public class Playlist {
         
     }
     */
+
+    /**
+     * Restituisce la rappresentazione testuale della playlist.
+     */
+    @Override
+    public String toString() {
+        return this.getName();
+    }
+    
 }
