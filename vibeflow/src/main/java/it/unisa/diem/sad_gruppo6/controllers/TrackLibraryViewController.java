@@ -4,7 +4,7 @@
  * Controller della vista 'TrackLibraryView.fxml'
  * Gestisce esclusovamente la UI.
  * 
- * @author EmanuelGraziuso
+ * @author EmanuelaGraziuso
  */
 
 package it.unisa.diem.sad_gruppo6.controllers;
