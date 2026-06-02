@@ -28,7 +28,7 @@ public class PlaybackController {
      */
     public PlaybackController() {
         this.playbackState = PlaybackState.getInstance();
-        this.playbackService = new PlaybackService(playbackState);
+        this.playbackService = PlaybackService.getInstance();
     }
 
     /**
@@ -76,6 +76,7 @@ public class PlaybackController {
      *
      * @param t La traccia da cui avviare la riproduzione.
      */
+    
     private void startPlayback(Track t) {
         playbackService.stop();                          
         playbackState.setCurrentTrack(t);                
@@ -112,4 +113,13 @@ public class PlaybackController {
         }
     }
 
+    /** Riprende la riproduzione se è in pausa. Delega il cambio di stato al PlaybackState 
+     * (che, tramite il pattern State, passerà a PlayingState) e avvia un nuovo flusso audio.
+     */
+    
+    public void resume() 
+    {
+        playbackState.play();        
+        playbackService.start();     
+    }
 }

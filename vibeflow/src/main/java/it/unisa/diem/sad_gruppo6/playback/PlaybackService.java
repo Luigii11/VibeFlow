@@ -5,6 +5,7 @@
  * @version 1.0 - versione senza traccia audio reale
  * 
  * @pattern Service
+ * @pattern Singleton
  * 
  * @author EmanuelChirico
  */
@@ -18,17 +19,23 @@ import javafx.util.Duration;
 public class PlaybackService {
 
     private PlaybackState playbackState;
+    private static PlaybackService instance;
     private Timeline timeline;
 
     /**
-     * Costruttore per PlaybackService, accetta lo stato del player da monitorare e aggiornare.
+     * Costruttore privato per implementare il pattern Singleton. 
+     * Inizializza lo stato di riproduzione.
      * 
-     * @param playbackState Lo stato del player da monitorare e aggiornare.
      */
-
-    public PlaybackService(PlaybackState playbackState) 
-    {
-        this.playbackState = playbackState;
+    private PlaybackService() {
+        this.playbackState = PlaybackState.getInstance();  
+    }
+    
+    public static PlaybackService getInstance() {
+        if (instance == null) {
+            instance = new PlaybackService();
+        }
+        return instance;
     }
 
     /**
@@ -61,7 +68,6 @@ public class PlaybackService {
     /**
      * Chiamato ogni secondo: fa avanzare la riproduzione.
      */
-
     private void tick() {
         return;
         // Da implementare.

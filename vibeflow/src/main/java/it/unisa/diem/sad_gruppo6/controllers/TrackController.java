@@ -8,19 +8,13 @@
 package it.unisa.diem.sad_gruppo6.controllers;
 
 import it.unisa.diem.sad_gruppo6.models.*;
-
-import java.io.IOException;
-
 import it.unisa.diem.sad_gruppo6.commands.*;
+import it.unisa.diem.sad_gruppo6.App;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.Node;
+import java.io.IOException;
 
 public class TrackController 
 {
@@ -33,29 +27,13 @@ public class TrackController
     @FXML private TextField genreField;
     @FXML private TextField yearField;
     @FXML private Label feedbackLabel;
-    @FXML private Track trackToEdit; 
+    private Track trackToEdit;   // NON @FXML: non arriva da un nodo dell'FXML
 
-    /**
-     * Costruttore del TrackController, inizializza la libreria delle tracce e il gestore dei comandi.
-     * 
-     * @param library la libreria delle tracce da gestire.
-     * @param commandManager il gestore dei comandi per eseguire azioni sulla libreria delle tracce.
-     */
     public TrackController() 
     {
         this.library = TrackLibrary.getInstance();
         this.commandManager = new CommandManager();
     }
-
-    /**
-     * Metodo per creare una nuova traccia e aggiungerla alla libreria, utilizzando un comando per incapsulare l'azione.
-     * 
-     * @param title Il titolo della traccia da creare.
-     * @param author L'autore della traccia da creare.
-     * @param duration La durata della traccia da creare in secondi.
-     * @param genre Il genere musicale della traccia da creare.
-     * @param year L'anno di pubblicazione della traccia da creare.
-     */
 
     public void createTrack(String title, String author, int duration, String genre, int year) 
     {
@@ -67,7 +45,8 @@ public class TrackController
     @FXML
     private void handleAddTrack() 
     {
-        try {
+        try 
+        {
             createTrack(
                 titleField.getText(),
                 authorField.getText(),
@@ -75,48 +54,25 @@ public class TrackController
                 genreField.getText(),
                 Integer.parseInt(yearField.getText())
             );
-            // feedbackLabel.setStyle("-fx-text-fill: green;");
-            // feedbackLabel.setText("Traccia aggiunta!");
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/diem/sad_gruppo6/views/TrackLibraryView.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) titleField.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-
-        } catch (NumberFormatException e) {
+            App.setRoot("TrackLibraryView");
+        } 
+        catch (NumberFormatException e) 
+        {
             feedbackLabel.setStyle("-fx-text-fill: red;");
             feedbackLabel.setText("Durata e anno devono essere numeri.");
-        } catch (IllegalArgumentException e) {
+        } 
+        catch (IllegalArgumentException e)
+        {
             feedbackLabel.setStyle("-fx-text-fill: red;");
             feedbackLabel.setText(e.getMessage());
-        }catch (IOException e) { 
+        } 
+        catch (IOException e) 
+        { 
             feedbackLabel.setStyle("-fx-text-fill: red;");
             feedbackLabel.setText("Errore nel caricamento della libreria.");
-            System.err.println("Errore nel tornare alla vista TrackLibraryView: " + e.getMessage());
         }
-
     }
 
-    /**
-     * Modifica i metadati di una traccia esistente nella libreria.
-     * Crea un nuovo oggetto {@link Track} con i dati aggiornati e delega
-     * l'operazione al CommandManager tramite {@link EditTrackCommand}.
-     *
-     * <p>La validazione degli input avviene implicitamente nel costruttore
-     * di {@link Track}: se un parametro non è valido viene sollevata
-     * {@link IllegalArgumentException} prima che il comando venga eseguito,
-     * lasciando la libreria invariata.</p>
-     *
-     * @param target   la traccia originale presente in libreria da modificare.
-     * @param title    il nuovo titolo.
-     * @param author   il nuovo autore.
-     * @param duration la nuova durata in secondi.         
-     * @param genre    il nuovo genere musicale.
-     * @param year     il nuovo anno di pubblicazione.
-     * @throws IllegalArgumentException se uno dei parametri non supera la validazione definita nei setter di {@link Track}.
-     */
-        
     public void editTrack(Track target, String title, String author, int duration, String genre, int year)
     {
         Track updatedTrack = new Track(title, author, duration, genre, year);
@@ -124,14 +80,6 @@ public class TrackController
         commandManager.execute(command);
     }
 
-    /**
-     * Pre-popola i campi del form con i metadati della traccia selezionata,
-     * preparando la vista per la modalità di modifica.
-     * Deve essere invocato dalla vista prima che il form venga mostrato all'utente
-     * (acceptance criteria 2: "il form si popola con i dati esistenti per quella traccia").
-     *
-     * @param track la traccia selezionata dalla libreria da modificare.
-     */
     public void setTrackToEdit(Track track)
     {
         this.trackToEdit = track;
@@ -142,21 +90,6 @@ public class TrackController
         yearField.setText(String.valueOf(track.getYear()));
     }   
 
-    /**
-     * Gestisce l'evento di click sul pulsante "Save" del form di modifica.
-     * Legge i nuovi valori dai campi FXML e tenta la modifica della traccia
-     * correntemente selezionata ({@code trackToEdit}).
-     *
-     * <p>Flusso (acceptance criteria ID_2):</p>
-     * <ol>
-     *   <li>Il form è già pre-popolato grazie a {@link #setTrackToEdit(Track)}.</li>
-     *   <li>L'utente modifica i campi e preme "Save".</li>
-     *   <li>Se la modifica non è valida, viene mostrato un messaggio di errore
-     *       e la libreria rimane invariata (acceptance criteria 4).</li>
-     *   <li>Se la modifica è corretta, la traccia nella libreria riflette
-     *       le modifiche (acceptance criteria 5).</li>
-     * </ol>
-     */
     @FXML
     private void handleEditTrack()
     {
@@ -164,7 +97,6 @@ public class TrackController
 
         try
         {
-            // 1. Esegue la modifica della traccia
             editTrack(
                 trackToEdit,
                 titleField.getText(),
@@ -173,17 +105,7 @@ public class TrackController
                 genreField.getText(),
                 Integer.parseInt(yearField.getText())
             );
-            
-            // 2. Torna alla schermata della lista canzoni (TrackLibraryView) mostrando la modifica effettuata
-            FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/it/unisa/diem/sad_gruppo6/views/TrackLibraryView.fxml")
-            );
-            Parent root = loader.load();
-            
-            // Prende lo stage corrente usando un qualsiasi elemento grafico presente nella view (es. titleField)
-            Stage stage = (Stage) titleField.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
+            App.setRoot("TrackLibraryView");
         }
         catch (NumberFormatException e)
         {
@@ -199,34 +121,40 @@ public class TrackController
         { 
             feedbackLabel.setStyle("-fx-text-fill: red;");
             feedbackLabel.setText("Errore nel tornare alla libreria.");
-            System.err.println("Errore nel tornare alla vista TrackLibraryView: " + e.getMessage());
         }
     }
 
-    /**
-     * Gestisce il click sul pulsante "Annulla": torna alla vista della libreria
-     * senza applicare modifiche.
-     *
-     * @param event l'evento di azione generato dal click sul pulsante.
-     */
     @FXML
     private void handleBack(ActionEvent event)
     {
         try
         {
-            FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/it/unisa/diem/sad_gruppo6/views/TrackLibraryView.fxml")
-            );
-            Parent root = loader.load();
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
+            App.setRoot("TrackLibraryView");
         }
         catch (IOException e)
         {
             feedbackLabel.setStyle("-fx-text-fill: red;");
             feedbackLabel.setText("Errore nel tornare alla libreria.");
         }
+    }
+
+    /**
+     * Rimuove una traccia dalla lista globale della libreria.
+     *
+     * @param track la traccia da rimuovere dalla libreria generale.
+     * @throws IllegalArgumentException se la traccia è null o non presente in libreria.
+     */
+    public void deleteTrack(Track track) {
+        if (track == null) {
+            throw new IllegalArgumentException("Impossibile rimuovere una traccia null.");
+        }
+        if (!library.getTracks().contains(track)) {
+            throw new IllegalArgumentException("La traccia da rimuovere non è presente in libreria.");
+        }
+
+        // Incapsula l'azione nel comando richiesto dal task
+        RemoveTrackFromLibraryCommand command = new RemoveTrackFromLibraryCommand(track);
+        commandManager.execute(command);
     }
 
 }
