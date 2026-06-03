@@ -20,6 +20,7 @@
 package it.unisa.diem.sad_gruppo6.controller.ui.playlist;
 
 import it.unisa.diem.sad_gruppo6.App;
+import it.unisa.diem.sad_gruppo6.controller.business.playback.PlaybackController;
 import it.unisa.diem.sad_gruppo6.controller.business.playlist.PlaylistController;
 import it.unisa.diem.sad_gruppo6.controller.ui.home.HomeController;
 import it.unisa.diem.sad_gruppo6.controller.ui.library.TrackLibraryViewController;
@@ -65,6 +66,7 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver{
     private PlaylistController playlistController;
     private PlaylistLibrary playlistLibrary;
     private TrackLibrary trackLibrary;
+    private PlaybackController playbackController = new PlaybackController();
     
     
     /**
@@ -84,6 +86,25 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver{
         this.playlistLibrary.registerObserver(this);
         
         refresh();
+
+        playlistTrackListView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Track selectedTrack = playlistTrackListView.getSelectionModel().getSelectedItem();
+                
+                if (selectedTrack != null) {
+                    try {
+                        // Per ora, avviamo solo la singola traccia selezionata (come facevi prima)
+                        playbackController.play(selectedTrack);
+                        
+                        // Cambia schermata aprendo il player
+                        App.setRoot("player/MediaPlayer");
+                    } catch (IOException e) {
+                        System.err.println("Errore nell'apertura del MediaPlayer: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     /**

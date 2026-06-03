@@ -13,12 +13,17 @@
  */
 package it.unisa.diem.sad_gruppo6.model.command;
 
+import java.util.List;
+
+import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
 import it.unisa.diem.sad_gruppo6.model.library.TrackLibrary;
+import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibrary;
 
 public class EditTrackCommand implements AppCommand
 {
     private final TrackLibrary library;
+    private final PlaylistLibrary playlistLibrary;
     private final Track oldTrack;
     private final Track updatedTrack;
 
@@ -32,6 +37,7 @@ public class EditTrackCommand implements AppCommand
     {
         // Utilizza il Singleton strutturato da Luigi
         this.library      = TrackLibrary.getInstance();
+        this.playlistLibrary = PlaylistLibrary.getInstance();
         this.oldTrack     = oldTrack;
         this.updatedTrack = updatedTrack;
     }
@@ -40,5 +46,19 @@ public class EditTrackCommand implements AppCommand
     public void execute()
     {
         library.updateTrack(oldTrack, updatedTrack);
+
+        List<Playlist> allPlaylists = playlistLibrary.getPlaylists();
+        for (Playlist p : allPlaylists) {
+            List<Track> tracksInPlaylist = p.getTracks();
+            
+            // Se la playlist contiene la vecchia traccia
+            if (tracksInPlaylist.contains(oldTrack)) {
+                // Sostituisci l'oggetto vecchio con quello nuovo
+                int index = tracksInPlaylist.indexOf(oldTrack);
+                tracksInPlaylist.set(index, updatedTrack);
+            }
+        }
+        
+        playlistLibrary.updatePlaylist(null); // O il metodo equivalente per forzare il notifyObservers()
     }
 }

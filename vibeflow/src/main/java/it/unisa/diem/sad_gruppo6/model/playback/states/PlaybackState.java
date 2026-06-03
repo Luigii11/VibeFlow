@@ -99,6 +99,15 @@ public class PlaybackState {
     }
 
     /**
+     * Restituisce la playlist attualmente impostata come contesto di riproduzione.
+     *
+     * @return La playlist corrente.
+     */
+    public Playlist getCurrentPlaylist() {
+        return this.currentPlaylist;
+    }
+
+    /**
      * Restituisce la traccia attualmente in riproduzione.
      *
      * @return La traccia corrente, o null se nessuna traccia è impostata.

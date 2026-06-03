@@ -4,7 +4,7 @@
  * Fornisce i metodi standard per l'attraversamento in avanti e all'indietro 
  * della coda di riproduzione, astraendo la logica dalla modalità specifica 
  * (es. Sequenziale, Shuffle, Loop).
- * * @pattern Iterator
+ * @pattern Iterator
  * @author LuigiAutorino
  */
 
