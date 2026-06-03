@@ -8,7 +8,7 @@
  * @pattern Observer
  * @pattern State (contesto)
  *
- * @author EmanuelChirico, LuigiAutorino
+ * @author EmanuelChirico, LuigiAutorino, ChiaraCrisci
  */
 
 package it.unisa.diem.sad_gruppo6.model.playback.states;
@@ -139,7 +139,10 @@ public class PlaybackState {
     }
 
     /**
-     * Imposta il tempo di riproduzione e notifica l'interfaccia.
+     * Imposta il tempo di riproduzione e notifica la UI.
+     * Viene chiamato ogni secondo da PlaybackService#tick(), quindi gli observer
+     * registrati devono essere leggeri per non impattare le performance.
+     *
      * @param position I secondi a cui posizionare la traccia.
      */
     public void seekTo(int position) {

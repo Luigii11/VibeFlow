@@ -4,7 +4,7 @@
  * con i controlli di riproduzione. Implementa l'interfaccia 'PlaybackObserver' per ricevere aggiornamenti.
  * 
  * 
- * @author EmanuelChirico, LuigiAutorino
+ * @author EmanuelChirico, LuigiAutorino, ChiaraCrisci
  */
 
 package it.unisa.diem.sad_gruppo6.controller.ui.player;
@@ -113,30 +113,22 @@ public class MediaPlayerController implements Initializable, PlaybackObserver {
 
     @FXML
     private void handlePlayPause() {
-        if (playbackState.getStatusName().equals("Playing")) 
-        {
-            playbackState.pause();
-        } 
-        else 
-        {
-            if (playbackState.getCurrentTrack() != null) 
-            {
-                playbackController.resume();
-            }
+        if (playbackState.getStatusName().equals("Playing")) {
+        playbackController.pause();   
+    } else {
+        if (playbackState.getCurrentTrack() != null) {
+            playbackController.resume();
         }
-
+    }
     }
 
     @FXML
-    private void handleBack() 
-    {
-        playbackState.removeObserver(this);  
-        try 
-        {
-            App.setRoot("library/TrackLibraryView");  
-        } 
-        catch (IOException e) 
-        {
+    private void handleBack() {
+        playbackController.pause();      
+        playbackState.removeObserver(this);
+        try {
+            App.setRoot("library/TrackLibraryView");
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
