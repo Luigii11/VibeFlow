@@ -8,14 +8,18 @@
  * @pattern Singleton
  * 
  * @author EmanuelChirico
+ * @author ChiaraCrisci
  */
 
 package it.unisa.diem.sad_gruppo6.model.service;
+
 
 import javafx.animation.Timeline;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
 import javafx.animation.KeyFrame;
 import javafx.util.Duration;
+import it.unisa.diem.sad_gruppo6.model.domain.Track;
+
 
 public class PlaybackService {
 
@@ -40,13 +44,15 @@ public class PlaybackService {
     }
 
     /**
-     * Avvia il flusso audio simulato, fermando eventuali flussi attivi e 
-     * facendo avanzare la riproduzione ogni secondo.
+     * Avvia il flusso audio simulato ripartendo dalla posizione corrente memorizzata
+     * in PlaybackState. Ferma eventuali flussi attivi prima di avviarne uno nuovo.
+     * Non avvia la Timeline se non è presente alcuna traccia in riproduzione.
      */
-
-    public void start() 
-    {
-        stop();  
+    public void start() {
+        stop();
+        if (playbackState.getCurrentTrack() == null) {
+            return; // Nessuna traccia: non ha senso avviare il timer
+        }
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> tick()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
@@ -66,11 +72,33 @@ public class PlaybackService {
         }
     }
 
-    /**
-     * Chiamato ogni secondo: fa avanzare la riproduzione.
+        /**
+     * Chiamato ogni secondo dalla Timeline: aggiorna la posizione corrente di
+     * riproduzione nel PlaybackState e ferma il servizio al termine della traccia.
+     *
+     * <p>Recupera la traccia corrente e la durata totale dal PlaybackState.
+     * Se la posizione attuale è inferiore alla durata totale, incrementa di 1
+     * secondo tramite {@link PlaybackState#seekTo(int)} (che notifica automaticamente
+     * gli osservatori, aggiornando la UI). Quando la posizione raggiunge o supera
+     * la durata totale, la Timeline viene fermata tramite {@link #stop()}.</p>
+     *
+     * @see PlaybackState#seekTo(int)
+     * @see PlaybackState#getCurrentPosition()
      */
     private void tick() {
-        return;
-        // Da implementare.
+        it.unisa.diem.sad_gruppo6.model.domain.Track currentTrack = playbackState.getCurrentTrack();
+        if (currentTrack == null) {
+            stop();
+            return;
+        }
+
+        int currentPos = playbackState.getCurrentPosition();
+        int totalDuration = currentTrack.getDuration();
+
+        if (currentPos < totalDuration) {
+            playbackState.seekTo(currentPos + 1);
+        } else {
+            stop();
+        }
     }
 }
