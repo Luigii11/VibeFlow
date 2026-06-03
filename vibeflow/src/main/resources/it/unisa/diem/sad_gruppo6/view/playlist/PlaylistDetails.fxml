@@ -37,10 +37,10 @@
     <Label text="Brani nella playlist:" style="-fx-font-weight: bold;"/>
     <ListView fx:id="playlistTrackListView" prefHeight="200" VBox.vgrow="ALWAYS"/>
     <HBox spacing="10">
-        <!--<Button text="Rimuovi traccia selezionata"
+        <Button text="Rimuovi traccia"
                 onAction="#handleRemoveTrack"
                 style="-fx-background-color: #e0e0e0;"/> 
-                -->
+                
     </HBox>
 
     <HBox alignment="BOTTOM_RIGHT" VBox.vgrow="ALWAYS">

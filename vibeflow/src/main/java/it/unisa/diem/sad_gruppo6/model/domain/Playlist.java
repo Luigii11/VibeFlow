@@ -100,12 +100,17 @@ public class Playlist {
     /**
      * Rimuove una traccia dalla playlist.
      * * @param t La traccia da rimuovere.
+     * 
+     * @throws IllegalArgumentException Se la traccia da rimuovere non è presente nella playlist.
      */
-    /*
+    
     public void removeTrack(Track t) {
+        if (!tracks.contains(t)) 
+            throw new IllegalArgumentException("La traccia non è presente nella playlist.");
         
+        tracks.remove(t);
     }
-    */
+    
 
     /**
      * Riordina la posizione di una traccia all'interno della playlist.
