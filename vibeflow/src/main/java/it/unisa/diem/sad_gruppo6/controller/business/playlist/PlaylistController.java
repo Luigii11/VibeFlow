@@ -152,8 +152,6 @@ public class PlaylistController {
         commandManager.execute(command);
         playlistLibrary.updatePlaylist(p); 
     }
-    
-    
 
     /*
     /**

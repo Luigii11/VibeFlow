@@ -22,7 +22,6 @@ package it.unisa.diem.sad_gruppo6.controller.ui.playlist;
 import it.unisa.diem.sad_gruppo6.App;
 import it.unisa.diem.sad_gruppo6.controller.business.playback.PlaybackController;
 import it.unisa.diem.sad_gruppo6.controller.business.playlist.PlaylistController;
-import it.unisa.diem.sad_gruppo6.controller.ui.home.HomeController;
 import it.unisa.diem.sad_gruppo6.controller.ui.library.TrackLibraryViewController;
 import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
@@ -30,17 +29,12 @@ import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibrary;
 import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibraryObserver;
 import it.unisa.diem.sad_gruppo6.model.library.TrackLibrary;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.stage.Stage;
 import javafx.event.ActionEvent;
-
 import java.io.IOException;
 import java.util.Optional;
 

@@ -18,7 +18,6 @@ import javafx.animation.Timeline;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
 import javafx.animation.KeyFrame;
 import javafx.util.Duration;
-import it.unisa.diem.sad_gruppo6.model.domain.Track;
 
 
 public class PlaybackService {
