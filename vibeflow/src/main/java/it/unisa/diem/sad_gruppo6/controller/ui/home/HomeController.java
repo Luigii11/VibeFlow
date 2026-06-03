@@ -29,10 +29,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.Optional;
+
 
 
 public class HomeController implements PlaylistLibraryObserver {
@@ -101,6 +105,21 @@ public class HomeController implements PlaylistLibraryObserver {
         playlistListView.getItems().setAll(playlistLibrary.getPlaylists());
     }
 
+
+    /**
+     * Gestisce la pressione del pulsante menu.
+     * Naviga alla schermata di visualizzazione di tutte le tracce della libreria.
+     */
+    @FXML
+    private void handleGoToAllTracks(ActionEvent event) {
+        try {
+            App.setRoot("library/TrackLibraryView");
+        } catch (IOException e) {
+            System.err.println("Errore nella navigazione a TrackLibraryView: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
    @FXML
     private void handleGoToCreatePlaylist(ActionEvent event) {
         try {
@@ -127,8 +146,42 @@ public class HomeController implements PlaylistLibraryObserver {
     }
 
     /**
-     * metodo elimina playlist
+     * Gestisce la pressione sul pulsante "Elimina playlist".
+     * Mostra un popup di conferma; se confermato, elimina la playlist selezionata.
+     * Se la playlist è autogenerata, mostra un alert di errore.
      */
+
+    @FXML
+    private void handleDeletePlaylist(ActionEvent event ){
+        Playlist selectedPlaylist = playlistListView.getSelectionModel().getSelectedItem();
+
+        if(selectedPlaylist == null){
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Seleziona una playlist da eliminare.", ButtonType.OK);
+            alert.setTitle("Nessuna playlist selezionata");
+            alert.setHeaderText("Nessuna playlist selezionata");
+            alert.showAndWait();
+            
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Elimina playlist");
+        confirm.setHeaderText("Sei sicuro?");
+        confirm.setContentText("Vuoi eliminare la playlist \"" + selectedPlaylist.getName() + "\"?");
+
+        Optional<ButtonType> result = confirm.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+        try {
+            playlistController.deletePlaylist(selectedPlaylist);
+        } catch (IllegalArgumentException e) {
+            Alert error = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
+            error.setTitle("Operazione non consentita");
+            error.setHeaderText("Impossibile eliminare la playlist");
+            error.showAndWait();
+        }
+    }
+    }
 
   
 }
