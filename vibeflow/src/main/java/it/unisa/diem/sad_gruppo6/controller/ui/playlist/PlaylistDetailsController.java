@@ -12,7 +12,7 @@
  * @see PlaylistController
  * @see PlaylistLibraryObserver
  * 
- * @author EmanuelaGraziuso
+ * @author EmanuelaGraziuso, ChiaraCrisci
  */
 
 
@@ -206,5 +206,32 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver{
         alert.setTitle(title);
         alert.setHeaderText(title);
         alert.showAndWait();
+    }
+
+    /**
+     * Gestisce la pressione del pulsante "Rinomina".
+     * Mostra un dialogo testuale per inserire il nuovo nome, poi delega
+     * l'operazione al {@link PlaylistController#renamePlaylist(Playlist, String)}.
+     * In caso di errore di validazione, mostra un Alert all'utente.
+     *
+     * @param event L'evento di click sul pulsante.
+     */
+    @FXML
+    private void handleRenamePlaylist(ActionEvent event) {
+        // Dialogo di input testuale
+        javafx.scene.control.TextInputDialog dialog = new javafx.scene.control.TextInputDialog(currentPlaylist.getName());
+        dialog.setTitle("Rinomina Playlist");
+        dialog.setHeaderText("Inserisci il nuovo nome per la playlist:");
+        dialog.setContentText("Nuovo nome:");
+
+        Optional<String> result = dialog.showAndWait();
+
+        result.ifPresent(newName -> {
+            try {
+                playlistController.renamePlaylist(currentPlaylist, newName);
+            } catch (IllegalArgumentException e) {
+                showAlert(AlertType.ERROR, "Rinomina non riuscita", e.getMessage());
+            }
+        });
     }
 }

@@ -2,7 +2,7 @@
  * @file PlaylistLibrary.java
  * Classe che gestisce la libreria delle playlist dell'utente.
  * Fungere da 'Subject' nel pattern Observer per notificare le viste dei cambiamenti.
- * * @author LuigiAutorino
+ * * @author LuigiAutorino, ChiaraCrisci
  */
 package it.unisa.diem.sad_gruppo6.model.library;
 
@@ -65,11 +65,14 @@ public class PlaylistLibrary {
 
     /**
      * Aggiorna lo stato di una playlist esistente all'interno della libreria
-     * e notifica gli observer.
-     * * @param p La playlist da aggiornare.
+     * e notifica gli observer affinché la UI si aggiorni.
+     *
+     * @param p La playlist aggiornata da propagare agli observer.
      */
     public void updatePlaylist(Playlist p) {
-        
+        if (p != null && playlists.contains(p)) {
+            notifyObservers();
+        }
         int index = playlists.indexOf(p);
              if (index >= 0) {
                 playlists.set(index, p);
@@ -138,6 +141,7 @@ public class PlaylistLibrary {
             observer.onPlaylistLibraryChanged();
         }
     }
+
 
 }
 

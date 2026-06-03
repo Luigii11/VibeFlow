@@ -29,10 +29,13 @@
                 onAction="#handleGoBack"
                 style="-fx-background-color: transparent; -fx-font-size: 18px; -fx-cursor: hand; -fx-padding: 2 8 2 4;"/>
         <Label fx:id="playlistNameLabel"
-               style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+                style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
         <Label fx:id="trackCountLabel"
-               style="-fx-text-fill: gray; -fx-font-size: 14px;"/>
-    </HBox>
+                style="-fx-text-fill: gray; -fx-font-size: 14px;"/>
+        <Button text="✏ Rinomina"
+            onAction="#handleRenamePlaylist"
+            style="-fx-background-color: #f0f0f0; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 4 12 4 12;"/>
+</HBox>
 
     <Label text="QUALE TRACCIA VUOI RIMUOVERE?" fx:id="removePromptLabel"
        visible="false" style="-fx-font-weight: bold; -fx-font-size: 14px;"
