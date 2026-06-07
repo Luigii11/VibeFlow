@@ -48,7 +48,7 @@ public class TrackControllerEditTest {
             testLibrary.removeTrack(t); 
         }
 
-        testCommandManager = new CommandManager();
+        testCommandManager = CommandManager.getInstance();
         testController = new TrackController();
 
         // Traccia di partenza presente in libreria prima di ogni test

@@ -90,11 +90,10 @@ public class TrackEditDialogController {
             
             System.out.println("DEBUG UI: Modifica Validata -> Vecchio Titolo: " + trackToEdit.getTitle() + " | Nuovo: " + title);
             
-            // Mock visivo: modifichiamo l'oggetto in ram per vedere subito il cambiamento (Da rimuovere)
-            trackToEdit.setTitle(title);
-            trackToEdit.setAuthor(author);
-            trackToEdit.setGenre(genre);
-            trackToEdit.setYear(year);
+            Track updatedTrack = new Track(title, author, duration, genre, year);
+            it.unisa.diem.sad_gruppo6.model.command.CommandManager.getInstance().execute(
+                new it.unisa.diem.sad_gruppo6.model.command.EditTrackCommand(trackToEdit, updatedTrack)
+            );
             close();
 
         } catch (NumberFormatException e) {

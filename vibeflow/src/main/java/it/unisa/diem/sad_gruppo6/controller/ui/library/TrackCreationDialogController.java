@@ -78,8 +78,11 @@ public class TrackCreationDialogController {
             System.out.println("DEBUG UI: Traccia Validata -> " + title + " (" + year + ")");
             
             // Mock temporaneo per test visivo (da rimuovere una volta implementato il controller)
-            it.unisa.diem.sad_gruppo6.model.library.TrackLibrary.getInstance().addTrack(
+            it.unisa.diem.sad_gruppo6.model.command.CommandManager.getInstance().execute(
+            new it.unisa.diem.sad_gruppo6.model.command.AddTrackToLibraryCommand(
+                it.unisa.diem.sad_gruppo6.model.library.TrackLibrary.getInstance(),
                 new it.unisa.diem.sad_gruppo6.model.domain.Track(title, author, duration, genre, year)
+                )
             );
             close();
 

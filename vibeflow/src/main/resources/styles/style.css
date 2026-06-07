@@ -426,3 +426,43 @@
 .track-table .placeholder {
     -fx-background-color: transparent;
 }
+
+.undo-notification-bar {
+    -fx-background-color: #1A1A1A;
+    -fx-border-color: #5E27BF;
+    -fx-border-width: 0 0 0 3px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 10px 16px;
+}
+
+.undo-notification-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.undo-countdown-label {
+    -fx-text-fill: #888888;
+    -fx-font-size: 13px;
+    -fx-min-width: 18px;
+    -fx-alignment: center;
+}
+
+.undo-cancel-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #5E27BF;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-border-color: #5E27BF;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 4px 12px;
+}
+
+.undo-cancel-btn:hover {
+    -fx-background-color: #5E27BF;
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: dropshadow(three-pass-box, rgba(94, 39, 191, 0.4), 8, 0, 0, 0);
+}

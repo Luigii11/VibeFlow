@@ -36,7 +36,7 @@ public class TrackController
     public TrackController() 
     {
         this.library = TrackLibrary.getInstance();
-        this.commandManager = new CommandManager();
+        this.commandManager = CommandManager.getInstance();
     }
 
     public void createTrack(String title, String author, int duration, String genre, int year) 

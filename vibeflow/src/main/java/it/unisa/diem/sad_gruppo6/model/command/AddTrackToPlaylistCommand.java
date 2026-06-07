@@ -18,12 +18,14 @@
 package it.unisa.diem.sad_gruppo6.model.command;
 
 import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
+import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibrary;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
 
 public class AddTrackToPlaylistCommand implements AppCommand {
 
     private final Playlist playlist;
     private final Track track;
+    
 
     /**
      * Costruttore del comando.
@@ -44,5 +46,14 @@ public class AddTrackToPlaylistCommand implements AppCommand {
     public void execute() {
         playlist.addTrack(track);
         
+    }
+
+    /**
+     * Annulla il comando rimuovendo la traccia dalla playlist.
+     */
+    @Override
+    public void undo(){
+        playlist.removeTrack(track);
+
     }
 }

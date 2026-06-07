@@ -13,7 +13,9 @@ import it.unisa.diem.sad_gruppo6.controller.business.playback.PlaybackController
 import it.unisa.diem.sad_gruppo6.controller.ui.player.MediaPlayerController;
 import it.unisa.diem.sad_gruppo6.controller.ui.playlist.PlaylistDetailsController;
 import it.unisa.diem.sad_gruppo6.controller.ui.utils.DialogUtils;
+import it.unisa.diem.sad_gruppo6.model.command.CommandManager;
 import it.unisa.diem.sad_gruppo6.model.command.AddTrackToPlaylistCommand;
+import it.unisa.diem.sad_gruppo6.model.command.AddTrackToLibraryCommand;
 import it.unisa.diem.sad_gruppo6.model.command.RemoveTrackFromLibraryCommand;
 import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
@@ -38,6 +40,10 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.util.Duration;
 
 import java.io.IOException;
 
@@ -58,12 +64,18 @@ public class TrackLibraryViewController implements TrackLibraryObserver {
     @FXML private TableColumn<Track, String> durationCol;
     @FXML private TableColumn<Track, Void> actionCol;
     @FXML private Button addTrackButton; 
+    @FXML private HBox   undoNotificationBar;
+    @FXML private Label  undoMessageLabel;
+    @FXML private Label  undoCountdownLabel;
+    @FXML private Button undoCancelButton;
     @FXML private MediaPlayerController mediaPlayerController;
+
 
     private TrackLibrary library;
     private PlaybackController playbackController;
     private boolean isSelectionMode = false;
     private Playlist targetPlaylist;
+    private Timeline undoTimeline;
 
     /**
      * @brief Metodo di inizializzazione standard invocato dal framework JavaFX.
@@ -178,9 +190,11 @@ public class TrackLibraryViewController implements TrackLibraryObserver {
                 addBtn.setOnAction(e -> {
                     Track track = getTableView().getItems().get(getIndex());
                     try {
-                        new AddTrackToPlaylistCommand(targetPlaylist, track).execute();
+                        CommandManager.getInstance().execute(
+                        new AddTrackToPlaylistCommand(targetPlaylist, track));
                         PlaylistLibrary.getInstance().updatePlaylist(targetPlaylist);
-                        handleGoBack(null);
+                       //handleGoBack(null);
+                        navigateBackWithUndo();
                     } catch (IllegalArgumentException ex) {
                         showError("Cannot add track", ex.getMessage());
                     }
@@ -210,6 +224,21 @@ public class TrackLibraryViewController implements TrackLibraryObserver {
     }
 
     /**
+     * @brief Torna a PlaylistDetails dopo una selezione, segnalando che una traccia è stata aggiunta.
+     * @details Chiama init(playlist, true) per attivare la notifica Undo nella vista di destinazione (ID_16).
+     */
+    private void navigateBackWithUndo() {
+        prepareForNavigation();
+        try {
+            PlaylistDetailsController controller =
+                App.setRootAndGetController("playlist/PlaylistDetails");
+            controller.init(targetPlaylist, true);
+        } catch (IOException e) {
+            showError("Navigation Error", "Could not navigate to the previous view.");
+        }
+    }
+
+    /**
      * @brief Metodo richiamato dall'Observer quando viene inserita una nuova traccia.
      * @param track La nuova traccia aggiunta alla TrackLibrary.
      */
@@ -230,8 +259,12 @@ public class TrackLibraryViewController implements TrackLibraryObserver {
 
     /**
      * @brief Gestisce le operazioni di pulizia della memoria prima del cambio scena.
+     * @details Ferma il timeline del countdown Undo se attivo.
      */
     private void prepareForNavigation() {
+        if (undoTimeline != null) {
+        undoTimeline.stop();
+        }
         this.library.removeObserver(this);
         if (mediaPlayerController != null) {
             mediaPlayerController.cleanup();
@@ -245,6 +278,9 @@ public class TrackLibraryViewController implements TrackLibraryObserver {
     @FXML
     private void handleAddTrack(ActionEvent event) {
         try {
+
+            int sizeBeforeDialog = library.getTracks().size();
+
             FXMLLoader loader = new FXMLLoader(App.class.getResource("/it/unisa/diem/sad_gruppo6/view/library/TrackCreationDialog.fxml"));
             Parent root = loader.load();
 
@@ -257,6 +293,10 @@ public class TrackLibraryViewController implements TrackLibraryObserver {
             scene.setFill(javafx.scene.paint.Color.TRANSPARENT); 
             dialogStage.setScene(scene);
             dialogStage.showAndWait(); 
+
+            if (library.getTracks().size() > sizeBeforeDialog) {
+            showUndoNotification("Track added to library.");
+            }
             
         } catch (IOException e) {
             showError("UI Error", "Could not load the track creation dialog.");
@@ -286,7 +326,7 @@ public class TrackLibraryViewController implements TrackLibraryObserver {
             scene.setFill(javafx.scene.paint.Color.TRANSPARENT); 
             dialogStage.setScene(scene);
             dialogStage.showAndWait(); 
-            trackTable.refresh();
+            onLibraryChanged();
             
         } catch (IOException e) {
             showError("UI Error", "Could not load the track editing dialog.");
@@ -306,7 +346,7 @@ public class TrackLibraryViewController implements TrackLibraryObserver {
         try {
             if (isSelectionMode && targetPlaylist != null) {
                 PlaylistDetailsController controller = App.setRootAndGetController("playlist/PlaylistDetails");
-                controller.init(targetPlaylist);
+                controller.init(targetPlaylist, false);
             } else {
                 App.setRoot("home/Home");
             }
@@ -330,10 +370,62 @@ public class TrackLibraryViewController implements TrackLibraryObserver {
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                new RemoveTrackFromLibraryCommand(track).execute();
+                CommandManager.getInstance().execute(new RemoveTrackFromLibraryCommand(track));
+                showUndoNotification("\"" + track.getTitle() + "\" removed from library.");
             }
         });
     }
+
+    /**
+     * Mostra il pannello di notifica con un countdown per annullare l'aggiunta della traccia alla libreria delle tracce.
+     * Avvia un Timeline JavaFX da 10 secondi. Allo scadere dei 10 secondi: nasconde la notifica senza invocare undo().
+     * Se l'utente clicca "Annulla", viene invocato CommandManager.undo() e la notifica scompare.
+     * 
+     * @param message Il testo descrittivo mostrato nel banner.
+     */
+    private void showUndoNotification(String message){
+        if (undoTimeline != null) {
+        undoTimeline.stop();
+    }
+
+    undoMessageLabel.setText(message);
+    undoNotificationBar.setVisible(true);
+    undoNotificationBar.setManaged(true);
+
+    final int[] secondsLeft = {10};
+    undoCountdownLabel.setText(String.valueOf(secondsLeft[0]));
+
+    undoTimeline = new Timeline(
+        new KeyFrame(Duration.seconds(1), e -> {
+            secondsLeft[0]--;
+            undoCountdownLabel.setText(String.valueOf(secondsLeft[0]));
+
+            // Scaduto il tempo: l'operazione diventa permanente
+            if (secondsLeft[0] <= 0) {
+                undoTimeline.stop();
+                undoNotificationBar.setVisible(false);
+                undoNotificationBar.setManaged(false);
+            }
+        })
+    );
+    undoTimeline.setCycleCount(10);
+    undoTimeline.play();
+    }
+
+
+    /**
+     * Handler del pulsante "Annulla" nella notifica.
+     */
+    @FXML
+    private void handleUndo(){
+        if (undoTimeline != null) {
+                undoTimeline.stop();
+            }
+            undoNotificationBar.setVisible(false);
+            undoNotificationBar.setManaged(false);
+            CommandManager.getInstance().undo();
+    }
+
 
     /**
      * @brief Helper utility per mostrare messaggi di errore a schermo in formato modale.

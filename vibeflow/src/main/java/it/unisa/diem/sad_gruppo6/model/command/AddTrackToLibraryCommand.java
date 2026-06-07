@@ -44,4 +44,11 @@ public class AddTrackToLibraryCommand implements AppCommand
         library.addTrack(track);
     }
     
+    /**
+     * Annulla il comando rimuovendo la traccia dalla libreria.
+     */
+    @Override
+    public void undo() {
+        library.removeTrack(track);
+    }
 }

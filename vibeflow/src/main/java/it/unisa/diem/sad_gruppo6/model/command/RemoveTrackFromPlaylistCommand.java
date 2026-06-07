@@ -21,6 +21,7 @@ public class RemoveTrackFromPlaylistCommand implements AppCommand {
 
     private final Playlist playlist;
     private final Track track;
+    private int originalIndex;
 
     /**
      * Costruttore della classe.
@@ -41,9 +42,19 @@ public class RemoveTrackFromPlaylistCommand implements AppCommand {
      */
     @Override
     public void execute() {
+        originalIndex = playlist.getTracks().indexOf(track);
+
         if (playlist.getTracks().contains(track)) {
             playlist.getTracks().remove(track);
         }
+    }
+     /**
+     * Annulla la rimozione reinserendo la traccia nella posizione originale.
+     */
+    @Override
+    public void undo() {
+        int safeIndex = Math.max(0, Math.min(originalIndex, playlist.getTracks().size()));
+        playlist.getTracks().add(safeIndex, track);
     }
 }
 

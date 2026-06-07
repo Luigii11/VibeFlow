@@ -162,6 +162,13 @@ public class PlaylistController {
         playlistLibrary.updatePlaylist(p); 
     }
 
+    /**
+     * Delega l'operazione di undo al CommandManager.
+     */
+     public void undo(){
+        commandManager.undo();
+    }
+
     /*
     /**
      * Cambia la posizione di una traccia all'interno di una playlist.

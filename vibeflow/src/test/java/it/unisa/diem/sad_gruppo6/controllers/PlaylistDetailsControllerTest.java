@@ -61,7 +61,7 @@ public class PlaylistDetailsControllerTest {
             testTrackLibrary.removeTrack(t);
         }
 
-        testCommandManager = new CommandManager();
+        testCommandManager = CommandManager.getInstance();
         testPlaylistController = new PlaylistController(
                 testTrackLibrary, testPlaylistLibrary, testCommandManager);
 

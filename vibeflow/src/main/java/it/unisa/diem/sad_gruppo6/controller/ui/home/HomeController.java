@@ -71,7 +71,7 @@ public class HomeController implements PlaylistLibraryObserver {
     public void initialize() {
         this.playlistLibrary = PlaylistLibrary.getInstance();
         TrackLibrary trackLibrary = TrackLibrary.getInstance();
-        CommandManager commandManager = new CommandManager();
+        CommandManager commandManager = CommandManager.getInstance();
 
         this.playlistController = new PlaylistController(trackLibrary, this.playlistLibrary, commandManager);
         this.playlistLibrary.registerObserver(this);

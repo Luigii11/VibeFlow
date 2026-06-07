@@ -16,7 +16,9 @@
  */
 package it.unisa.diem.sad_gruppo6.model.command;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
@@ -28,6 +30,10 @@ public class RemoveTrackFromLibraryCommand implements AppCommand
     private final TrackLibrary library;
     private final PlaylistLibrary playlistLibrary;
     private final Track track;
+
+    private int originalIndex;
+    private final Map<Playlist, Integer> originalPlaylistPositions = new HashMap<>();
+
 
     /**
      * Costruttore del comando RemoveTrackFromLibraryCommand.
@@ -50,13 +56,32 @@ public class RemoveTrackFromLibraryCommand implements AppCommand
     @Override
     public void execute()
     {
-        library.removeTrack(track);
+        originalIndex = library.getTracks().indexOf(track);
+        originalPlaylistPositions.clear();
+
         List<Playlist> allPlaylists = playlistLibrary.getPlaylists();
         for (Playlist p : allPlaylists) {
-            if (p.getTracks().contains(track)) {
+            int pos = p.getTracks().indexOf(track);
+            if (pos>=0) {
+                originalPlaylistPositions.put(p, pos);
                 p.getTracks().remove(track);
                 playlistLibrary.updatePlaylist(p); 
             }
         }
+        library.removeTrack(track);
+    }
+     /**
+     * Annulla la rimozione reinserendo la traccia nella posizione originale memorizzata.
+     */
+    @Override
+    public void undo() {
+        // Ripristina la traccia in ogni playlist nella posizione originale
+        for (Map.Entry<Playlist, Integer> entry : originalPlaylistPositions.entrySet()) {
+            Playlist p = entry.getKey();
+            int safeIndex = Math.max(0, Math.min(entry.getValue(), p.getTracks().size()));
+            p.getTracks().add(safeIndex, track);
+            playlistLibrary.updatePlaylist(p);
+        }
+       library.addTrackAtIndex(track, originalIndex);
     }
 }

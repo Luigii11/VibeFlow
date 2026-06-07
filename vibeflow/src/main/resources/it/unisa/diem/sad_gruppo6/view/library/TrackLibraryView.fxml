@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
 
 <BorderPane prefHeight="760.0" prefWidth="1080.0" styleClass="main-root" stylesheets="@/styles/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.diem.sad_gruppo6.controller.ui.library.TrackLibraryViewController">
 
@@ -37,6 +38,14 @@
                 </HBox>
 
                 <Separator styleClass="content-separator" />
+
+                <HBox fx:id="undoNotificationBar" alignment="CENTER_LEFT" spacing="15.0" styleClass="undo-notification-bar" visible="false" managed="false">
+                    <Label fx:id="undoMessageLabel" styleClass="undo-notification-label" text="Track added to library." />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="undoCountdownLabel" styleClass="undo-countdown-label" text="10" />
+                    <Button fx:id="undoCancelButton" mnemonicParsing="false" onAction="#handleUndo" styleClass="undo-cancel-btn" text="Undo" />
+                </HBox>
+
 
                 <VBox spacing="12.0" VBox.vgrow="ALWAYS">
                     <children>

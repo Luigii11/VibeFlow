@@ -49,7 +49,7 @@ public class RenamePlaylistTest {
         controller = new PlaylistController(
             TrackLibrary.getInstance(),
             playlistLibrary,
-            new CommandManager()
+            CommandManager.getInstance()
         );
 
         userPlaylist  = new Playlist("Rock Anni 80", false);

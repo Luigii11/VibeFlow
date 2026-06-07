@@ -21,6 +21,7 @@ import it.unisa.diem.sad_gruppo6.controller.ui.library.TrackLibraryViewControlle
 import it.unisa.diem.sad_gruppo6.controller.ui.player.MediaPlayerController;
 import it.unisa.diem.sad_gruppo6.controller.ui.utils.DialogUtils;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
+import it.unisa.diem.sad_gruppo6.model.command.CommandManager;
 import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
 import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibrary;
 import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibraryObserver;
@@ -37,7 +38,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
 import javafx.event.ActionEvent;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
+
+
+
 
 import java.io.IOException;
 import java.util.Optional;
@@ -55,6 +63,13 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
     @FXML private TableColumn<Track, String> durationCol;
     @FXML private TableColumn<Track, Void> actionCol;
     @FXML private MediaPlayerController mediaPlayerController;
+    @FXML private HBox undoNotificationBar;
+   @FXML private Label  undoMessageLabel;
+    @FXML private Label  undoCountdownLabel;
+    @FXML private Button undoCancelButton;
+
+  
+
 
     /* Attributi */
     private Playlist currentPlaylist;
@@ -62,21 +77,23 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
     private PlaylistLibrary playlistLibrary;
     private PlaybackState playbackState;
     private PlaybackController playbackController;
-    
+    private Timeline undoTimeline;
+
     /**
      * @brief Inizializzazione del contesto e registrazione degli Observer.
      * @details Configura il controller in base alla playlist selezionata, recupera i Singleton 
      * necessari per il business logic e inizializza i listener per i click sulla tabella.
+     * Se trackJustAdded è true, mostra subito la notifica Undo.
      * @param playlist La playlist corrente di cui mostrare i dettagli.
      */
-    public void init(Playlist playlist) {
+    public void init(Playlist playlist, boolean trackJustAdded) {
         this.currentPlaylist = playlist;
         this.playlistLibrary = PlaylistLibrary.getInstance();
         
         this.playlistController = new PlaylistController(
             TrackLibrary.getInstance(), 
             this.playlistLibrary, 
-            new it.unisa.diem.sad_gruppo6.model.command.CommandManager() 
+            CommandManager.getInstance()
         );
 
         this.playbackState = PlaybackState.getInstance();
@@ -96,6 +113,19 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
                 }
             }
         });
+
+        if (trackJustAdded) {
+        showUndoNotification("Track added to playlist.");
+        } 
+    }
+
+    /**
+     * @brief Overload di init() per il caso standard (nessuna traccia appena aggiunta).
+     * @details Delega all'overload completo passando trackJustAdded = false.
+     * @param playlist La playlist corrente di cui mostrare i dettagli.
+     */
+    public void init(Playlist playlist) {
+        init(playlist, false);
     }
 
     /**
@@ -229,6 +259,7 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
     @FXML
     private void handleGoBack(ActionEvent event) {
         try {
+            if(undoTimeline!=null) undoTimeline.stop();
             this.playlistLibrary.removeObserver(this);
             this.playbackState.removeObserver(this);
             if (this.mediaPlayerController != null) {
@@ -256,7 +287,56 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
         if (result.isPresent() && result.get() == ButtonType.OK) {
             playlistController.removeTrackFromPlaylist(track, currentPlaylist);
             refresh();
+            showUndoNotification("\"" + track.getTitle() + "\" removed from playlist.");
         }
+    }
+
+    /**
+     * Mostra il pannello di notifica con countdown per annullare l'aggiunta della traccia alla playlist.
+     * Avvia un timeline javafx di 10 secondi. Allo scadere dei 10 secondi l'operazione di aggiunta diventa permanente.
+     * 
+     * @param message Testo da mostrare nel banner della notifica.
+     */
+    private void showUndoNotification(String message){
+        if(undoTimeline != null) undoTimeline.stop();
+
+        undoMessageLabel.setText(message);
+        undoNotificationBar.setVisible(true);
+        undoNotificationBar.setManaged(true);
+
+        final int[] secondsLeft = {10};
+        undoCountdownLabel.setText(String.valueOf(secondsLeft[0]));
+
+        undoTimeline = new Timeline(
+            new KeyFrame(Duration.seconds(1), e -> {
+                secondsLeft[0]--;
+                undoCountdownLabel.setText(String.valueOf(secondsLeft[0]));
+
+                // Scaduto il tempo: notifica scompare, nessun undo 
+                if (secondsLeft[0] <= 0) {
+                    undoTimeline.stop();
+                    undoNotificationBar.setVisible(false);
+                    undoNotificationBar.setManaged(false);
+                }
+            })
+        );
+        undoTimeline.setCycleCount(10);
+        undoTimeline.play();
+    }
+
+    /**
+     * Handler del pulsante "Annulla" nella notifica. Ferma il countdown, nasconde la notifica e invoca CommandManager.unod() per 
+     * rimuovere la traccia appena aggiunta alla playlist. 
+     */
+    @FXML
+    private void handleUndo(){
+        if (undoTimeline != null) undoTimeline.stop();
+    
+        undoNotificationBar.setVisible(false);
+        undoNotificationBar.setManaged(false);
+
+        CommandManager.getInstance().undo();
+        refresh();
     }
 
     /**

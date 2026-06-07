@@ -35,7 +35,7 @@ public class PlaylistControllerTest {
         testTrackLibrary = TrackLibrary.getInstance();
         testLibrary = PlaylistLibrary.getInstance();
         testLibrary.clear();
-        testCommandManager = new CommandManager();
+        testCommandManager = CommandManager.getInstance();
 
         testController = new PlaylistController(testTrackLibrary, testLibrary, testCommandManager);
     }

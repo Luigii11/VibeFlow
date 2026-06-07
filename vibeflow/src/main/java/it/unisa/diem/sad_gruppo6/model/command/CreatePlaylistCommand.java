@@ -35,4 +35,14 @@ public class CreatePlaylistCommand implements AppCommand {
         playlistLibrary.addPlaylist(playlistToAdd);
     }
      
+     /**
+     * Operazione di undo non supportata per questo comando.
+     * @throws UnsupportedOperationException Per segnalare che questa operazione non è stata ancora implementata.
+     */
+    @Override
+    public void undo() {
+        throw new UnsupportedOperationException(
+            "Undo not supported for " + this.getClass().getSimpleName()
+        );
+    }
 }

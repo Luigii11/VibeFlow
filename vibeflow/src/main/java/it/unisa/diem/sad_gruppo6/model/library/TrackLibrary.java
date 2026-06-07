@@ -163,4 +163,24 @@ public class TrackLibrary
         tracks.remove(track);
         notifyObserver();
     }
+
+
+    /**
+     * Reinserisce una traccia nella posizione originale specificata (usato da undo).
+     * Poiché la struttura interna è un LinkedHashSet, ricostruisce l'intero set
+     * inserendo la traccia all'indice desiderato e mantenendo l'ordine degli altri elementi.
+     *
+     * @param track la traccia da reinserire.
+     * @param index la posizione originale in cui reinserire la traccia.
+     */
+    public void addTrackAtIndex(Track track, int index)
+    {
+        List<Track> list = new ArrayList<>(tracks);
+        int safeIndex = Math.max(0, Math.min(index, list.size()));
+        list.add(safeIndex, track);
+        tracks = new LinkedHashSet<>(list);
+        notifyTrackAdded(track);
+        notifyObserver();
+    }
+  
 }

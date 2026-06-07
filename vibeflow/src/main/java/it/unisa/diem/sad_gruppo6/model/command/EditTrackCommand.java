@@ -61,4 +61,15 @@ public class EditTrackCommand implements AppCommand
         
         playlistLibrary.updatePlaylist(null); // O il metodo equivalente per forzare il notifyObservers()
     }
+
+   /**
+     * Operazione di undo non supportata per questo comando.
+     * @throws UnsupportedOperationException Per segnalare che questa operazione non è stata ancora implementata.
+     */
+    @Override
+    public void undo() {
+        throw new UnsupportedOperationException(
+            "Undo not supported for " + this.getClass().getSimpleName()
+        );
+    }
 }
