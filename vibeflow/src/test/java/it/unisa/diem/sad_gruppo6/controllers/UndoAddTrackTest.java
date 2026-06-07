@@ -64,8 +64,8 @@ public class UndoAddTrackTest {
         currentPlaylist = new Playlist("Test Playlist", false);
         testPlaylistLibrary.addPlaylist(currentPlaylist);
 
-        trackA = new Track("Napule è", "Pino Daniele", 227, "Pop", 1977);
-        trackB = new Track("Je so' pazzo", "Pino Daniele", 223, "Blues", 1979);
+        trackA = new Track("Napule è", "Pino Daniele", 227, "Pop", 1977, null);
+        trackB = new Track("Je so' pazzo", "Pino Daniele", 223, "Blues", 1979, null);
     }
 
     /**

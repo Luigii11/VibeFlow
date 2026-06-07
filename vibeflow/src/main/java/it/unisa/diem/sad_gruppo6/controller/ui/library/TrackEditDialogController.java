@@ -90,7 +90,7 @@ public class TrackEditDialogController {
             
             System.out.println("DEBUG UI: Modifica Validata -> Vecchio Titolo: " + trackToEdit.getTitle() + " | Nuovo: " + title);
             
-            Track updatedTrack = new Track(title, author, duration, genre, year);
+            Track updatedTrack = new Track(title, author, duration, genre, year, null);
             it.unisa.diem.sad_gruppo6.model.command.CommandManager.getInstance().execute(
                 new it.unisa.diem.sad_gruppo6.model.command.EditTrackCommand(trackToEdit, updatedTrack)
             );

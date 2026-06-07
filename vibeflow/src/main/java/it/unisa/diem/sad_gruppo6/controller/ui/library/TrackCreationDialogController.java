@@ -70,56 +70,6 @@ public class TrackCreationDialogController {
      * dai metadati dalla traccia al momento del salvataggio via TrackController.
      */
     @FXML
-
-    private void handleSave(ActionEvent event) {
-        String title = titleField.getText().trim();
-        String author = authorField.getText().trim();
-        String durationStr = durationField.getText().trim();
-        String genre = genreField.getText().trim();
-        String yearStr = yearField.getText().trim();
-
-        // 1. Validazione UI: Controllo campi vuoti
-        if (title.isEmpty() || author.isEmpty() || durationStr.isEmpty() || genre.isEmpty() || yearStr.isEmpty()) {
-            showError("Missing Information", "All fields are required. Please fill in every detail.");
-            return;
-        }
-
-        try {
-            // 2. Validazione UI: Controllo valori numerici
-            int duration = Integer.parseInt(durationStr);
-            if (duration <= 0) {
-                showError("Invalid Duration", "Duration must be a positive number of seconds.");
-                return;
-            }
-
-            int year = Integer.parseInt(yearStr);
-            if (year < 1900 || year > 2026) {
-                showError("Invalid Year", "Please enter a valid release year (1900 - 2026).");
-                return;
-            }
-
-            // =========================================================
-            // ---> AREA DI INTERVENTO BUSINESS LOGIC (TODO) <---
-            // I dati sono stati validati dalla UI. 
-            // Inserire qui la chiamata al controller di business:
-            // trackController.createTrack(title, author, duration, genre, year);
-            // =========================================================
-            
-            System.out.println("DEBUG UI: Traccia Validata -> " + title + " (" + year + ")");
-            
-            Track updatedTrack = new Track(title, author, duration, genre, year);
-            it.unisa.diem.sad_gruppo6.model.command.CommandManager.getInstance().execute(
-                new it.unisa.diem.sad_gruppo6.model.command.EditTrackCommand(trackToEdit, updatedTrack)
-            );
-            close();
-
-        } catch (NumberFormatException e) {
-            showError("Format Error", "Duration and Year must contain only numeric characters.");
-        } catch (IllegalArgumentException e) {
-            showError("Invalid Data", e.getMessage());
-        }
-    }
-
     private void handleBrowseFile(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Seleziona file audio");
@@ -129,10 +79,8 @@ public class TrackCreationDialogController {
         File file = fileChooser.showOpenDialog(pathField.getScene().getWindow());
         if (file != null) {
             pathField.setText(file.getAbsolutePath());
-
         }
     }
-
     /**
      * @brief Gestisce il salvataggio: validazione UI, poi delega al business controller.
      * @details In modalità create chiama trackController.createTrack();

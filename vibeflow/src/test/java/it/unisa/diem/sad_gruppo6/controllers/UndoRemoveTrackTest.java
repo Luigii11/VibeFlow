@@ -62,9 +62,9 @@ public class UndoRemoveTrackTest {
         historyField.setAccessible(true);
         ((java.util.Stack<?>) historyField.get(testCommandManager)).clear();
 
-        trackA = new Track("Napule è", "Pino Daniele", 227, "Pop", 1977);
-        trackB = new Track("Je so' pazzo", "Pino Daniele", 223, "Blues", 1979);
-        trackC = new Track("Quanno chiove", "Pino Daniele", 275, "Blues", 1980);
+        trackA = new Track("Napule è", "Pino Daniele", 227, "Pop", 1977, null);
+        trackB = new Track("Je so' pazzo", "Pino Daniele", 223, "Blues", 1979, null);
+        trackC = new Track("Quanno chiove", "Pino Daniele", 275, "Blues", 1980, null);
 
         testLibrary.addTrack(trackA);
         testLibrary.addTrack(trackB);

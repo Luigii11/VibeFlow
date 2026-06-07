@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import it.unisa.diem.sad_gruppo6.controller.business.track.TrackController;
+import it.unisa.diem.sad_gruppo6.model.command.CommandManager;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
 import it.unisa.diem.sad_gruppo6.model.library.TrackLibrary;
 
@@ -38,6 +39,7 @@ public class TrackControllerEditTest {
     private TrackLibrary testLibrary;
     private TrackController testController;
     private Track existingTrack;
+    private CommandManager testCommandManager;
 
     /**
      * Metodo di setup eseguito prima di ogni singolo test (@BeforeEach).
