@@ -13,25 +13,13 @@ import it.unisa.diem.sad_gruppo6.model.command.EditTrackCommand;
 import it.unisa.diem.sad_gruppo6.model.command.RemoveTrackFromLibraryCommand;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
 import it.unisa.diem.sad_gruppo6.model.library.TrackLibrary;
-import it.unisa.diem.sad_gruppo6.App;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Label;
-import java.io.IOException;
+import it.unisa.diem.sad_gruppo6.utility.AudioMetadataExtractor;
 
 public class TrackController 
 {
     private TrackLibrary library;
     private CommandManager commandManager;
-
-    @FXML private TextField titleField;
-    @FXML private TextField authorField;
-    @FXML private TextField durationField;
-    @FXML private TextField genreField;
-    @FXML private TextField yearField;
-    @FXML private Label feedbackLabel;
-    private Track trackToEdit;   // NON @FXML: non arriva da un nodo dell'FXML
+    private Track trackToEdit;   
 
     public TrackController() 
     {
@@ -39,107 +27,21 @@ public class TrackController
         this.commandManager = CommandManager.getInstance();
     }
 
-    public void createTrack(String title, String author, int duration, String genre, int year) 
+    public void createTrack(String title, String author, String genre, int year, String path) 
     {
-        Track track = new Track(title, author, duration, genre, year);
+        int length = AudioMetadataExtractor.extractDuration(path);
+        Track track = new Track(title, author, length, genre, year, path);
         AddTrackToLibraryCommand command = new AddTrackToLibraryCommand(library, track);
         commandManager.execute(command);
     }
 
-    @FXML
-    private void handleAddTrack() 
+   
+    public void editTrack(Track target, String title, String author, String genre, int year, String path)
     {
-        try 
-        {
-            createTrack(
-                titleField.getText(),
-                authorField.getText(),
-                Integer.parseInt(durationField.getText()),
-                genreField.getText(),
-                Integer.parseInt(yearField.getText())
-            );
-            App.setRoot("library/TrackLibraryView");
-        } 
-        catch (NumberFormatException e) 
-        {
-            feedbackLabel.setStyle("-fx-text-fill: red;");
-            feedbackLabel.setText("Durata e anno devono essere numeri.");
-        } 
-        catch (IllegalArgumentException e)
-        {
-            feedbackLabel.setStyle("-fx-text-fill: red;");
-            feedbackLabel.setText(e.getMessage());
-        } 
-        catch (IOException e) 
-        { 
-            feedbackLabel.setStyle("-fx-text-fill: red;");
-            feedbackLabel.setText("Errore nel caricamento della libreria.");
-        }
-    }
-
-    public void editTrack(Track target, String title, String author, int duration, String genre, int year)
-    {
-        Track updatedTrack = new Track(title, author, duration, genre, year);
+        int length = AudioMetadataExtractor.extractDuration(path);
+        Track updatedTrack = new Track(title, author, length, genre, year, path);
         EditTrackCommand command = new EditTrackCommand(target, updatedTrack);
         commandManager.execute(command);
-    }
-
-    public void setTrackToEdit(Track track)
-    {
-        this.trackToEdit = track;
-        titleField.setText(track.getTitle());
-        authorField.setText(track.getAuthor());
-        durationField.setText(String.valueOf(track.getDuration()));
-        genreField.setText(track.getGenre());
-        yearField.setText(String.valueOf(track.getYear()));
-    }   
-
-    @FXML
-    private void handleEditTrack()
-    {
-        if (trackToEdit == null) return;
-
-        try
-        {
-            editTrack(
-                trackToEdit,
-                titleField.getText(),
-                authorField.getText(),
-                Integer.parseInt(durationField.getText()),
-                genreField.getText(),
-                Integer.parseInt(yearField.getText())
-            );
-            App.setRoot("library/TrackLibraryView");
-        }
-        catch (NumberFormatException e)
-        {
-            feedbackLabel.setStyle("-fx-text-fill: red;");
-            feedbackLabel.setText("Durata e anno devono essere numeri.");
-        }
-        catch (IllegalArgumentException e)
-        {
-            feedbackLabel.setStyle("-fx-text-fill: red;");
-            feedbackLabel.setText(e.getMessage());
-        }
-        catch (IOException e) 
-        { 
-            feedbackLabel.setStyle("-fx-text-fill: red;");
-            feedbackLabel.setText("Errore nel tornare alla libreria.");
-        }
-    }
-
-    @FXML
-    private void handleBack(ActionEvent event)
-    {
-        try
-        {
-            App.setRoot("library/TrackLibraryView");
-        }
-        catch (IOException e)
-        {
-            feedbackLabel.setStyle("-fx-text-fill: red;");
-            feedbackLabel.setText("Errore nel tornare alla libreria.");
-        }
     }
 
     /**

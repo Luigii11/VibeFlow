@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.ColumnConstraints?>
 
 <VBox fx:id="rootContainer" spacing="25.0" styleClass="dialog-pane, main-root" stylesheets="@/styles/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.diem.sad_gruppo6.controller.ui.library.TrackCreationDialogController">
     
@@ -22,22 +23,29 @@
     </VBox>
 
     <GridPane alignment="CENTER" hgap="15.0" vgap="15.0">
-        
+        <columnConstraints>
+            <ColumnConstraints minWidth="100.0" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="250.0" />
+        </columnConstraints>
+
         <Label style="-fx-text-fill: #AAAAAA; -fx-font-size: 14px; -fx-font-weight: bold;" text="Title" GridPane.columnIndex="0" GridPane.rowIndex="0" />
         <TextField fx:id="titleField" prefWidth="250.0" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
         <Label style="-fx-text-fill: #AAAAAA; -fx-font-size: 14px; -fx-font-weight: bold;" text="Author" GridPane.columnIndex="0" GridPane.rowIndex="1" />
         <TextField fx:id="authorField" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-        <Label style="-fx-text-fill: #AAAAAA; -fx-font-size: 14px; -fx-font-weight: bold;" text="Duration (s)" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-        <TextField fx:id="durationField" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-
         <Label style="-fx-text-fill: #AAAAAA; -fx-font-size: 14px; -fx-font-weight: bold;" text="Genre" GridPane.columnIndex="0" GridPane.rowIndex="3" />
         <TextField fx:id="genreField" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
         <Label style="-fx-text-fill: #AAAAAA; -fx-font-size: 14px; -fx-font-weight: bold;" text="Year" GridPane.columnIndex="0" GridPane.rowIndex="4" />
         <TextField fx:id="yearField" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-        
+
+        <Label style="-fx-text-fill: #AAAAAA; -fx-font-size: 14px; -fx-font-weight: bold;" text="Audio File" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+        <HBox spacing="10.0" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="5">
+            <TextField fx:id="pathField" styleClass="text-field" editable="false" promptText="Select audio file..." HBox.hgrow="ALWAYS" />
+            <Button styleClass="button" text="Browse" onAction="#handleBrowseFile" minWidth="70.0" />
+        </HBox>
+
     </GridPane>
 
     <HBox alignment="CENTER_RIGHT" spacing="15.0">

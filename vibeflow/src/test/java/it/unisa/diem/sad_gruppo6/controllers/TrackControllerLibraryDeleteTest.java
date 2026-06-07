@@ -46,7 +46,7 @@ public class TrackControllerLibraryDeleteTest{
 
         testController = new TrackController();
 
-        existingTrack = new Track("Bohemian Rhapsody", "Queen", 354, "Rock", 1975);
+        existingTrack = new Track("Bohemian Rhapsody", "Queen", 354, "Rock", 1975, null);
         testLibrary.addTrack(existingTrack);
     }
 
@@ -68,7 +68,7 @@ public class TrackControllerLibraryDeleteTest{
      */
     @Test
     public void testDeletedTrackNotInGeneralLibrary() {
-        Track secondTrack = new Track("Imagine", "John Lennon", 187, "Pop", 1971);
+        Track secondTrack = new Track("Imagine", "John Lennon", 187, "Pop", 1971, null);
         testLibrary.addTrack(secondTrack);
 
         testController.deleteTrack(existingTrack);
@@ -85,7 +85,7 @@ public class TrackControllerLibraryDeleteTest{
      */
     @Test
     public void testDeleteTrackNotInGeneralLibraryThrowsException() {
-        Track notInLibrary = new Track("Stairway to Heaven", "Led Zeppelin", 482, "Rock", 1971);
+        Track notInLibrary = new Track("Stairway to Heaven", "Led Zeppelin", 482, "Rock", 1971, null);
 
         assertThrows(IllegalArgumentException.class, () ->
             testController.deleteTrack(notInLibrary),

@@ -8,7 +8,6 @@
  */
 
 package it.unisa.diem.sad_gruppo6.model.playback.states;
-import it.unisa.diem.sad_gruppo6.model.playback.iterators.PlaylistIterator;
 
 public class PlayingState implements PlayerState {
 
@@ -45,38 +44,5 @@ public class PlayingState implements PlayerState {
         ctx.changeState(new PausedState());
     }
 
-    /**
-     * Esegue lo skip in avanti interrogando il PlaylistIterator.
-     * Se è presente una traccia successiva, aggiorna la traccia corrente 
-     * e resetta il contatore di riproduzione a 0.
-     * @param ctx Il contesto globale dello stato di riproduzione.
-     */
-    @Override
-    public void next(PlaybackState ctx) {
-        PlaylistIterator iterator = ctx.getIterator();
-        if (iterator != null && iterator.hasNext()) {
-            ctx.setCurrentTrack(iterator.next());
-            ctx.seekTo(0);
-        }
-    }
-
-    /**
-     * Esegue lo skip all'indietro o il riavvio della traccia attuale.
-     * Se la traccia in esecuzione ha superato i 10 secondi, viene semplicemente riavviata da 0.
-     * Se si trova prima dei 10 secondi, tenta di caricare la traccia precedente dalla coda.
-     * @param ctx Il contesto globale dello stato di riproduzione.
-     */
-    @Override
-    public void previous(PlaybackState ctx) {
-        if (ctx.getCurrentPosition() >= 10) {
-            ctx.seekTo(0);
-        } else {
-            PlaylistIterator iterator = ctx.getIterator();
-            if (iterator != null && iterator.hasPrevious()) {
-                ctx.setCurrentTrack(iterator.previous());
-            }
-            ctx.seekTo(0);
-        }
-    }
 
 }

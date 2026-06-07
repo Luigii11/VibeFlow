@@ -10,6 +10,8 @@
 
 package it.unisa.diem.sad_gruppo6.model.playback.states;
 
+import it.unisa.diem.sad_gruppo6.model.playback.iterators.PlaylistIterator;
+
 public interface PlayerState 
 {
 
@@ -41,13 +43,30 @@ public interface PlayerState
      * Gestisce la richiesta di avanzamento alla traccia successiva (Next).
      * @param ctx Il contesto del PlaybackState contenente le informazioni globali.
      */
-    void next(PlaybackState ctx);
-
+    default void next(PlaybackState ctx) 
+    {
+        PlaylistIterator iterator = ctx.getIterator();
+        if (iterator != null && iterator.hasNext()) 
+        {
+            ctx.setCurrentTrack(iterator.next());
+            ctx.seekTo(0);
+        }
+    }
     /**
      * Gestisce la richiesta di ritorno alla traccia precedente (Previous).
      * Implementa la regola di business sul minutaggio (es. 10 secondi).
      * @param ctx Il contesto del PlaybackState contenente le informazioni globali.
      */
-    void previous(PlaybackState ctx);
+    default void previous(PlaybackState ctx) {
+        if (ctx.getCurrentPosition() >= 10) {
+            ctx.seekTo(0);
+        } else {
+            PlaylistIterator iterator = ctx.getIterator();
+            if (iterator != null && iterator.hasPrevious()) {
+                ctx.setCurrentTrack(iterator.previous());
+            }
+            ctx.seekTo(0);
+        }
+    }
 }
 

@@ -8,6 +8,9 @@
 package it.unisa.diem.sad_gruppo6.model.domain;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.Path;
 
 public class Track 
 {
@@ -18,6 +21,7 @@ public class Track
     private String genre;
     private int year; 
     private int playCount;
+    private String path;
 
     /**
      * Costruttore classe 'Track'.
@@ -28,15 +32,17 @@ public class Track
      * @param genre Il genere musicale della traccia.
      * @param year L'anno di pubblicazione della traccia.  
      * @param playCount Il numero di volte che la traccia è stata riprodotta.
+     * @param path Il percorso del file audio della traccia.
      */
 
-    public Track(String title, String author, int duration, String genre, int year) 
+    public Track(String title, String author, int duration, String genre, int year, String path) 
     {
         setTitle(title);
         setAuthor(author);
-        setDuration(duration);
         setGenre(genre);
         setYear(year);
+        setPath(path);
+        setDuration(duration);
         this.playCount = 0;
     }
 
@@ -133,7 +139,7 @@ public class Track
     public void setYear(int year) 
     {
         int currentYear = LocalDate.now().getYear();
-        if (year < 1970 || year > currentYear) 
+        if (year < 1900 || year > currentYear) 
         {
             throw new IllegalArgumentException("L'anno di pubblicazione deve essere compreso tra 1970 e " + currentYear + ".");
         }
@@ -150,6 +156,40 @@ public class Track
         return playCount;
     }
 
+    /**
+     * Setter del percorso del file audio della traccia, con controllo di validità sull'input.
+     * 
+     */
+    public void setPath (String path)
+    {
+        if (path == null || path.isBlank())
+        {
+            throw new IllegalArgumentException("Il percorso del file audio non può essere vuoto.");
+        }
+        if (!path.toLowerCase().endsWith(".mp3"))
+        {
+            throw new IllegalArgumentException("Il percorso del file audio deve terminare con .mp3");
+        }
+
+        Path filePath = Paths.get(path);
+
+        if (Files.exists(filePath) == false)
+        {
+            throw new IllegalArgumentException("Il percorso del file audio non esiste.");
+        }
+
+        this.path = path;
+    }
+
+    /**
+     * Getter del percorso del file audio della traccia, con controllo di validità sull'input.
+     * 
+     * @return Il percorso del file audio della traccia.
+     */
+    public String getPath(){
+        return this.path;
+    }
+
      /**
      * Metodo equals sovrascritto per confrontare due oggetti di tipo 'Track' basandosi su titolo e autore,
      * ignorando gli altri attributi come durata, genere, anno e playCount, in quanto due tracce con lo stesso 
@@ -157,6 +197,7 @@ public class Track
      *  
      * @return true se i titoli e gli autori delle tracce sono uguali, false altrimenti.
      */
+    
     @Override
     public boolean equals(Object obj) 
     {

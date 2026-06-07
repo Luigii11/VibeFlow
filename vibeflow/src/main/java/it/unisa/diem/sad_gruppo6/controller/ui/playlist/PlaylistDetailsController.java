@@ -47,6 +47,7 @@ import javafx.util.Duration;
 
 
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -105,14 +106,18 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
         refresh();
         updateHeaderPlayButton(); 
 
-        trackTable.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                Track selectedTrack = trackTable.getSelectionModel().getSelectedItem();
-                if (selectedTrack != null) {
-                    playbackController.play(currentPlaylist.getTracks(), selectedTrack);
-                }
+       trackTable.setOnMouseClicked(event -> {
+        if (event.getClickCount() == 2) {
+        Track selectedTrack = trackTable.getSelectionModel().getSelectedItem();
+        if (selectedTrack != null) {
+            try {
+                playbackController.play(selectedTrack);
+            } catch (FileNotFoundException e) {
+                showAlert(AlertType.ERROR, "File Not Found", 
+                    "La traccia non è più disponibile nel percorso originale.");
             }
-        });
+
+    }}});
 
         if (trackJustAdded) {
         showUndoNotification("Track added to playlist.");
@@ -126,7 +131,8 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
      */
     public void init(Playlist playlist) {
         init(playlist, false);
-    }
+
+        }
 
     /**
      * @brief Collega dinamicamente le colonne della TableView alle proprietà dei brani.
@@ -211,11 +217,12 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
     }
 
     /**
+     * @throws FileNotFoundException 
      * @brief Gestisce l'avvio della riproduzione dell'intera playlist o il cambio di stato pausa/play.
      * @param event L'evento di click sul pulsante circolare di Playback nell'intestazione.
      */
     @FXML
-    private void handlePlayPlaylist(ActionEvent event) {
+    private void handlePlayPlaylist(ActionEvent event) throws FileNotFoundException {
         if (currentPlaylist == null || currentPlaylist.getTracks().isEmpty()) {
             showAlert(AlertType.WARNING, "Empty Playlist", "This playlist has no tracks to play.");
             return;
@@ -230,10 +237,13 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
             }
         } else {
             try {
-                playbackController.play(currentPlaylist);
-            } catch (IllegalArgumentException e) {
-                showAlert(AlertType.ERROR, "Playback Error", e.getMessage());
-            }
+            playbackController.play(currentPlaylist);
+        } catch (IllegalArgumentException e) {
+            showAlert(AlertType.ERROR, "Playback Error", e.getMessage());
+        } catch (FileNotFoundException e) {
+            showAlert(AlertType.ERROR, "File Not Found", 
+                "La traccia non è più disponibile nel percorso originale.");
+        }
         }
     }
 
