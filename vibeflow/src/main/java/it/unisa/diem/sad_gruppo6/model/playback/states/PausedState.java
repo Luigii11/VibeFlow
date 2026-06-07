@@ -16,8 +16,7 @@ public class PausedState implements PlayerState {
     */
 
     @Override
-    public String getStatusName() 
-    {
+    public String getStatusName() {
         return "Paused";
     }
 
@@ -29,8 +28,7 @@ public class PausedState implements PlayerState {
     */
 
     @Override
-    public void play(PlaybackState ctx) 
-    {
+    public void play(PlaybackState ctx) {
         ctx.changeState(new PlayingState());
     }
 
@@ -42,8 +40,7 @@ public class PausedState implements PlayerState {
     */
 
     @Override
-    public void pause(PlaybackState ctx) 
-    {
+    public void pause(PlaybackState ctx) {
         return;
     }
     

@@ -3,7 +3,7 @@
  * Interfaccia per l'implementazione del pattern Iterator sulle playlist.
  * Fornisce i metodi standard per l'attraversamento in avanti e all'indietro 
  * della coda di riproduzione, astraendo la logica dalla modalità specifica 
- * (es. Sequenziale, Shuffle, Loop).
+ * (Sequenziale, Shuffle, Loop).
  * @pattern Iterator
  * @author LuigiAutorino
  */

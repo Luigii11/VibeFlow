@@ -1,40 +1,56 @@
 /**
- * La classe 'PlaybackService' gestisce il flusso audio del player. 
- * Utilizza un 'Timeline' di JavaFX per simulare la riproduzione, avanzando ogni secondo. 
+ * La classe 'PlaybackService' gestisce il flusso audio del player.
+ * Utilizza MediaPlayer di JavaFX per riprodurre il file audio 
+ * associato alla traccia corrente memorizzata in PlaybackState.
+ *
+ * Espone i metodi principali per il controllo della riproduzione:
+ * start() per avviare una nuova riproduzione, 
+ * pause() per mettere in pausa mantenendo la posizione corrente,
+ * stop() per fermare definitivamente
  * 
- * @version 1.0 - versione senza traccia audio reale
- * 
+ * @version 2.0 - versione con traccia .mp3 reale
+>>>>>>> Stashed changes
  * @pattern Service
  * @pattern Singleton
- * 
  * @author EmanuelChirico
  * @author ChiaraCrisci
  */
-
 package it.unisa.diem.sad_gruppo6.model.service;
 
-
 import javafx.animation.Timeline;
-import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
-import javafx.animation.KeyFrame;
-import javafx.util.Duration;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+
+import it.unisa.diem.sad_gruppo6.model.domain.Track;
+import it.unisa.diem.sad_gruppo6.model.playback.iterators.PlaylistIterator;
+import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.Media;
 
 public class PlaybackService {
 
+    /* Attributi */
     private PlaybackState playbackState;
+    private Track currentTrack;
     private static PlaybackService instance;
     private Timeline timeline;
+    private MediaPlayer player;
 
     /**
-     * Costruttore privato per implementare il pattern Singleton. 
-     * Inizializza lo stato di riproduzione.
-     * 
+     * @brief Costruttore privato per implementare il pattern Singleton. 
+     * @details Inizializza il riferimento allo stato di riproduzione.
      */
+
     private PlaybackService() {
         this.playbackState = PlaybackState.getInstance();  
     }
     
+    /**
+     * @brief Restituisce l'unica istanza di PlaybackService.
+     * @pattern Singleton
+     * @return L'istanza singleton di PlaybackService.
+     */
     public static PlaybackService getInstance() {
         if (instance == null) {
             instance = new PlaybackService();
@@ -43,35 +59,77 @@ public class PlaybackService {
     }
 
     /**
-     * Avvia il flusso audio simulato ripartendo dalla posizione corrente memorizzata
-     * in PlaybackState. Ferma eventuali flussi attivi prima di avviarne uno nuovo.
-     * Non avvia la Timeline se non è presente alcuna traccia in riproduzione.
+     * Avvia la riproduzione audio della traccia corrente memorizzata in
+     * PlaybackState. Ferma e libera eventuali player attivi prima di
+     * crearne uno nuovo, garantendo che la riproduzione riparta sempre dall'inizio.
+     * Non avvia alcuna riproduzione se non è presente una traccia corrente.
      */
-    public void start() {
+
+    public void start()  throws FileNotFoundException {
         stop();
-        if (playbackState.getCurrentTrack() == null) {
-            return; // Nessuna traccia: non ha senso avviare il timer
+        currentTrack = playbackState.getCurrentTrack();
+        if (currentTrack == null) {
+            return; 
         }
-        timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> tick()));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+        String currentTrackPath = currentTrack.getPath();   
+        File filepath = new File(currentTrackPath);
+        if (!filepath.exists()){
+            throw new FileNotFoundException("La traccia audio selezionata non esiste più nel path originale.");
+        }     
+        String play = filepath.toURI().toString();
+        Media playbleSong = new Media(play);
+        player = new MediaPlayer(playbleSong);
+        player.play();
+
     }
 
     /**
-     * Ferma il flusso audio simulato, se attivo. Viene chiamato quando si avvia un 
-     * nuovo flusso o si mette in pausa la riproduzione.
+     * Mette in pausa la riproduzione corrente, mantenendo la posizione attuale
+     * e le risorse del player allocate. La riproduzione può essere ripresa
+     * chiamando nuovamente player.play() sul MediaPlayer attivo.
      */
 
-    public void stop() 
+    public void pause ()
     {
-        if (timeline != null) 
-        {
-            timeline.stop();
-            timeline = null;
+        if (player != null){
+            player.pause();
         }
     }
 
-        /**
+    /**
+     * Ferma definitivamente la riproduzione e libera tutte le risorse associate
+     * al MediaPlayer tramite dispose(). Viene chiamato anche all'inizio
+     * di start() per garantire la corretta gestione delle risorse
+     * quando si cambia traccia.
+     */
+    
+    public void stop() 
+    {
+        if (player != null){
+            player.stop();
+            player.dispose();
+            player = null;
+        }
+        
+    }
+
+    public void resume() 
+    {
+        if (player != null) 
+        {
+            player.play();
+        }
+    }
+
+    public void setOnEndOfTrack(Runnable callback) 
+    {
+        if (player != null)
+        {
+            player.setOnEndOfMedia(callback);
+        }
+    }
+
+    /**
      * Chiamato ogni secondo dalla Timeline: aggiorna la posizione corrente di
      * riproduzione nel PlaybackState e ferma il servizio al termine della traccia.
      *
@@ -85,7 +143,7 @@ public class PlaybackService {
      * @see PlaybackState#getCurrentPosition()
      */
     private void tick() {
-        it.unisa.diem.sad_gruppo6.model.domain.Track currentTrack = playbackState.getCurrentTrack();
+        Track currentTrack = playbackState.getCurrentTrack();
         if (currentTrack == null) {
             stop();
             return;
@@ -95,9 +153,24 @@ public class PlaybackService {
         int totalDuration = currentTrack.getDuration();
 
         if (currentPos < totalDuration) {
+            // La traccia è ancora in corso: avanza di 1 secondo
             playbackState.seekTo(currentPos + 1);
         } else {
-            stop();
+            // La traccia corrente è terminata. Controlliamo se c'è un brano successivo.
+            PlaylistIterator iterator = playbackState.getIterator();
+            
+            if (iterator != null && iterator.hasNext()) {
+                // C'è un'altra traccia. Auto-scorrimento in avanti.
+                Track nextTrack = iterator.next();
+                playbackState.setCurrentTrack(nextTrack);
+                playbackState.seekTo(0);
+                // Non serve chiamare start(), la timeline è "INDEFINITE" e continuerà a ticchettare
+            } else {
+                // La playlist è finita. Nessun brano successivo.
+                stop();
+                playbackState.pause();
+                playbackState.seekTo(0);
+            }
         }
     }
 }

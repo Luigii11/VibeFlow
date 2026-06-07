@@ -171,7 +171,7 @@ public class Track
             throw new IllegalArgumentException("Il percorso del file audio deve terminare con .mp3");
         }
 
-        Path filePath = (Path) Paths.get(path);
+        Path filePath = Paths.get(path);
 
         if (Files.exists(filePath) == false)
         {

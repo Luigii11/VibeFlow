@@ -7,6 +7,8 @@
  */
 package it.unisa.diem.sad_gruppo6.controller.ui.player;
 
+import java.io.FileNotFoundException;
+
 import it.unisa.diem.sad_gruppo6.controller.business.playback.PlaybackController;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackObserver;
@@ -87,11 +89,16 @@ public class MediaPlayerController implements PlaybackObserver {
 
     @FXML
     private void handleNext(ActionEvent event) {
-        playbackController.next();
+        try {
+            playbackController.next();
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @FXML
-    private void handlePrevious(ActionEvent event) {
+    private void handlePrevious(ActionEvent event) throws FileNotFoundException {
         playbackController.previous();
     }
 

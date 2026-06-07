@@ -1,26 +1,32 @@
 /**
- * La classe 'PlaybackState' rappresenta lo stato attuale del player, inclusi la traccia corrente,
- * la playlist corrente e lo stato di riproduzione. Implementa il pattern Singleton per garantire
- * che ci sia una sola istanza durante l'esecuzione dell'applicazione, e agisce da Subject del
- * pattern Observer, notificando gli osservatori a ogni cambiamento di stato.
+ * @file PlaybackState.java
+ * @brief La classe 'PlaybackState' rappresenta lo stato globale del player audio.
+ * * Mantiene le informazioni sulla traccia corrente, la playlist corrente,
+ * lo stato di riproduzione (Playing, Paused) e la modalità di scorrimento
+ * (Sequenziale, Shuffle, Loop). Agisce da "Context" nel pattern State e da 
+ * "Subject" nel pattern Observer, notificando le viste ad ogni cambiamento.
  *
  * @pattern Singleton
  * @pattern Observer
- * @pattern State (contesto)
+ * @pattern State (Context)
  *
  * @author EmanuelChirico, LuigiAutorino, ChiaraCrisci
  */
 
 package it.unisa.diem.sad_gruppo6.model.playback.states;
+
 import it.unisa.diem.sad_gruppo6.model.playback.iterators.PlaylistIterator;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
 import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
+import it.unisa.diem.sad_gruppo6.model.playback.strategies.PlaybackMode;
+import it.unisa.diem.sad_gruppo6.model.playback.strategies.SequentialMode;
+
 import java.util.List;
 import java.util.ArrayList;
 
 public class PlaybackState {
 
-    // Attributi
+    /* Attributi */
     private static PlaybackState instance;
     private Track currentTrack;
     private Playlist currentPlaylist;
@@ -28,20 +34,21 @@ public class PlaybackState {
     private List<PlaybackObserver> observers;
     private int currentPosition;
     private PlaylistIterator iterator;
+    private PlaybackMode mode;
 
     /**
-     * Pattern Singleton che impedisce l'istanziazione dall'esterno.
-     * Inizializza la lista degli osservatori e imposta lo stato iniziale del player a PausedState.
+     * @brief Costruttore privato per il pattern Singleton.
+     * * Inizializza la lista degli osservatori, imposta lo stato iniziale a 
+     * PausedState e la modalità di riproduzione di default a SequentialMode.
      */
     private PlaybackState() {
         this.observers = new ArrayList<>();
         this.currentState = new PausedState();
+        this.mode = new SequentialMode();
     }
 
     /**
-     * Metodo per ottenere l'istanza singleton di PlaybackState.
-     * Se l'istanza non esiste, viene creata una nuova istanza.
-     *
+     * @brief Restituisce l'unica istanza di PlaybackState.
      * @pattern Singleton
      * @return L'istanza singleton di PlaybackState.
      */
@@ -53,24 +60,26 @@ public class PlaybackState {
     }
 
     /**
-     * Esegue l'azione di play delegandola allo stato corrente.
-     * Sarà lo stato attuale a decidere il comportamento ed eventualmente cambiare stato.
+     * @brief Avvia o riprende la riproduzione.
+     * * Delega l'azione di "play" allo stato corrente (PlayerState), il quale 
+     * deciderà come comportarsi ed eventualmente cambierà lo stato globale.
      */
     public void play() {
         currentState.play(this);
     }
 
     /**
-     * Esegue l'azione di pausa delegandola allo stato corrente.
-     * Sarà lo stato attuale a decidere il comportamento ed eventualmente cambiare stato.
+     * @brief Mette in pausa la riproduzione.
+     * * Delega l'azione di "pausa" allo stato corrente (PlayerState).
      */
     public void pause() {
         currentState.pause(this);
     }
 
     /**
-     * Cambia lo stato del player. Viene invocato dai PlayerState quando è necessaria una
-     * transizione di stato. Notifica gli osservatori a ogni cambiamento.
+     * @brief Cambia lo stato operativo del player e notifica gli observer.
+     * * Metodo invocato dalle classi concrete di PlayerState quando è necessaria 
+     * una transizione di stato (es. da Paused a Playing).
      *
      * @param newState Il nuovo stato da assegnare al player.
      */
@@ -80,9 +89,8 @@ public class PlaybackState {
     }
 
     /**
-     * Imposta la traccia attualmente in riproduzione e notifica gli osservatori del cambiamento.
-     *
-     * @param track La traccia da impostare come corrente.
+     * @brief Imposta la traccia attualmente in riproduzione e avvisa la UI.
+     * @param track La nuova traccia da impostare come corrente.
      */
     public void setCurrentTrack(Track track) {
         this.currentTrack = track;
@@ -90,17 +98,15 @@ public class PlaybackState {
     }
 
     /**
-     * Imposta la playlist attualmente in riproduzione come contesto corrente.
-     *
-     * @param playlist La playlist da impostare come corrente.
+     * @brief Imposta la playlist di contesto da cui pescare i brani.
+     * @param playlist La playlist da impostare.
      */
     public void setCurrentPlaylist(Playlist playlist) {
         this.currentPlaylist = playlist;
     }
 
     /**
-     * Restituisce la playlist attualmente impostata come contesto di riproduzione.
-     *
+     * @brief Restituisce la playlist attualmente in uso.
      * @return La playlist corrente.
      */
     public Playlist getCurrentPlaylist() {
@@ -108,51 +114,50 @@ public class PlaybackState {
     }
 
     /**
-     * Restituisce la traccia attualmente in riproduzione.
-     *
-     * @return La traccia corrente, o null se nessuna traccia è impostata.
+     * @brief Restituisce la traccia correntemente caricata nel player.
+     * @return La traccia corrente, o null se non c'è alcun brano caricato.
      */
     public Track getCurrentTrack() {
         return currentTrack;
     }
 
     /**
-     * Restituisce il nome dello stato corrente del player (es. "Playing", "Paused"),
-     * delegando allo stato attuale.
-     *
-     * @return Il nome dello stato corrente del player.
+     * @brief Restituisce il nome in formato stringa dello stato corrente.
+     * @return Il nome dello stato corrente (es. "Playing", "Paused").
      */
     public String getStatusName() {
         return currentState.getStatusName();
     }
 
     /**
-     * Esegue l'azione di skip in avanti delegandola allo stato corrente.
+     * @brief Salta alla traccia successiva.
+     * * Delega la logica di skip in avanti allo stato corrente.
      */
     public void next() {
         currentState.next(this);
     }
 
     /**
-     * Esegue l'azione di skip all'indietro delegandola allo stato corrente.
+     * @brief Torna alla traccia precedente.
+     * * Delega la logica di skip all'indietro allo stato corrente.
      */
     public void previous() {
         currentState.previous(this);
     }
 
     /**
-     * Restituisce la posizione attuale di riproduzione in secondi.
+     * @brief Restituisce i secondi trascorsi dall'inizio del brano.
+     * @return I secondi attuali di riproduzione.
      */
     public int getCurrentPosition() {
         return currentPosition;
     }
 
     /**
-     * Imposta il tempo di riproduzione e notifica la UI.
-     * Viene chiamato ogni secondo da PlaybackService#tick(), quindi gli observer
-     * registrati devono essere leggeri per non impattare le performance.
+     * @brief Aggiorna il tempo di riproduzione e notifica la grafica.
+     * * Chiamato frequentemente (es. ogni secondo) dai servizi audio di background.
      *
-     * @param position I secondi a cui posizionare la traccia.
+     * @param position La nuova posizione in secondi in cui posizionare l'indicatore.
      */
     public void seekTo(int position) {
         this.currentPosition = position;
@@ -160,43 +165,58 @@ public class PlaybackState {
     }
 
     /**
-     * Restituisce l'iteratore corrente per navigare la playlist.
+     * @brief Restituisce l'iteratore usato per scorrere la playlist.
+     * @return L'istanza corrente di PlaylistIterator.
      */
     public PlaylistIterator getIterator() {
         return iterator;
     }
     
     /**
-     * Imposta l'iteratore per la modalità di riproduzione corrente.
+     * @brief Sostituisce l'iteratore attivo con uno nuovo.
+     * @param iterator Il nuovo iteratore da assegnare.
      */
     public void setIterator(PlaylistIterator iterator) {
         this.iterator = iterator;
     }
 
     /**
-     * Registra un osservatore che verrà notificato a ogni cambiamento di stato del player.
-     *
+     * @brief Imposta la modalità logica di riproduzione (Sequenziale, Loop, ecc.).
+     * @param mode La nuova modalità (Strategy) da adottare.
+     */
+    public void setMode(PlaybackMode mode) {
+        this.mode = mode;
+    }
+
+    /**
+     * @brief Restituisce la modalità logica di riproduzione attualmente attiva.
+     * @return L'istanza della modalità in uso.
+     */
+    public PlaybackMode getMode() {
+        return this.mode;
+    }
+
+    /**
+     * @brief Aggiunge un osservatore alla lista per ricevere gli aggiornamenti di stato.
      * @pattern Observer
-     * @param o L'osservatore da registrare.
+     * @param o L'osservatore da registrare (solitamente un Controller della UI).
      */
     public void registerObserver(PlaybackObserver o) {
         observers.add(o);
     }
 
     /**
-     * Rimuove un osservatore precedentemente registrato.
-     *
+     * @brief Rimuove un osservatore dalla lista per non ricevere più aggiornamenti.
      * @pattern Observer
-     * @param o L'osservatore da rimuovere.
+     * @param o L'osservatore da disiscrivere.
      */
     public void removeObserver(PlaybackObserver o) {
         observers.remove(o);
     }
 
     /**
-     * Notifica tutti gli osservatori registrati di un cambiamento di stato,
-     * invocando il metodo update() su ciascuno di essi.
-     *
+     * @brief Segnala a tutti gli osservatori registrati che qualcosa è cambiato.
+     * * Itera sulla lista degli observer e chiama il loro metodo update().
      * @pattern Observer
      */
     private void notifyObservers() {

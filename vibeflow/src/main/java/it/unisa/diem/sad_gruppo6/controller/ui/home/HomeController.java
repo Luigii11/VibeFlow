@@ -53,8 +53,6 @@ import javafx.scene.layout.HBox;
  */
 public class HomeController implements PlaylistLibraryObserver {
 
-    // Attributi
-
     /* Componenti grafici */ 
     @FXML private TilePane playlistTilePane;
     @FXML private MediaPlayerController mediaPlayerController;
@@ -93,7 +91,7 @@ public class HomeController implements PlaylistLibraryObserver {
             }
             
             PlaylistDetailsController controller = App.setRootAndGetController("playlist/PlaylistDetails");
-            controller.init(playlist, this.playlistController, TrackLibrary.getInstance(), this.playlistLibrary);
+            controller.init(playlist);
         } catch (IOException e) {
             System.err.println("Error loading PlaylistDetails.fxml: " + e.getMessage());
             e.printStackTrace();

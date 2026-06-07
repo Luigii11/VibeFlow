@@ -4,13 +4,12 @@
  * @details Mostra i brani contenuti in una specifica playlist e permette all'utente di:
  * - Aggiungere una traccia alla playlist selezionandola dalla libreria globale.
  * - Rimuovere una traccia dalla playlist.
- * * L'interfaccia si aggiorna automaticamente tramite il pattern Observer sulla classe {@link PlaylistLibrary}.
+ * L'interfaccia si aggiorna automaticamente tramite il pattern Observer sulla classe {@link PlaylistLibrary}.
  * Inoltre, delega la gestione della barra del player audio inferiore a un sotto-controller integrato.
- * * @see PlaylistController
+ * @see PlaylistController
  * @see PlaylistLibraryObserver
  * @see PlayerBarController
- * * @author EmanuelaGraziuso, ChiaraCrisci, LuigiAutorino
- * @date Giugno 2026
+ * @author EmanuelaGraziuso, ChiaraCrisci, LuigiAutorino
  */
 
 package it.unisa.diem.sad_gruppo6.controller.ui.playlist;
@@ -39,6 +38,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.event.ActionEvent;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -65,23 +66,22 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
     
     /**
      * @brief Inizializzazione del contesto e registrazione degli Observer.
-     * @details Viene chiamato esternamente per passare i dati dinamicamente. Collega gli elementi
-     * della UI alle sorgenti dati e attiva i canali di ascolto per i cambiamenti di stato.
-     * @param playlist           La playlist di cui mostrare i dettagli.
-     * @param playlistController Il controller di business che gestisce le modifiche alla libreria.
-     * @param trackLibrary       Riferimento non utilizzato, mantenuto per compatibilità con la firma del metodo.
-     * @param playlistLibrary    Il catalogo globale (Singleton) contenente tutte le playlist.
+     * @details Configura il controller in base alla playlist selezionata, recupera i Singleton 
+     * necessari per il business logic e inizializza i listener per i click sulla tabella.
+     * @param playlist La playlist corrente di cui mostrare i dettagli.
      */
-    public void init(Playlist playlist, PlaylistController playlistController, TrackLibrary trackLibrary, PlaylistLibrary playlistLibrary) {
-        
+    public void init(Playlist playlist) {
         this.currentPlaylist = playlist;
-        this.playlistController = playlistController;
-        this.playlistLibrary = playlistLibrary;
+        this.playlistLibrary = PlaylistLibrary.getInstance();
         
+        this.playlistController = new PlaylistController(
+            TrackLibrary.getInstance(), 
+            this.playlistLibrary, 
+            new it.unisa.diem.sad_gruppo6.model.command.CommandManager() 
+        );
+
         this.playbackState = PlaybackState.getInstance();
         this.playbackController = new PlaybackController();
-        
-        // Registrazione degli osservatori sui Singleton core dell'applicazione
         this.playlistLibrary.registerObserver(this);
         this.playbackState.registerObserver(this); 
         
@@ -89,20 +89,25 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
         refresh();
         updateHeaderPlayButton(); 
 
-        // Gestione del doppio click sulle righe per avviare la riproduzione del brano
-        trackTable.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                Track selectedTrack = trackTable.getSelectionModel().getSelectedItem();
-                if (selectedTrack != null) {
-                    playbackController.play(selectedTrack);
-                }
+       trackTable.setOnMouseClicked(event -> {
+        if (event.getClickCount() == 2) {
+        Track selectedTrack = trackTable.getSelectionModel().getSelectedItem();
+        if (selectedTrack != null) {
+            try {
+                playbackController.play(selectedTrack);
+            } catch (FileNotFoundException e) {
+                showAlert(AlertType.ERROR, "File Not Found", 
+                    "La traccia non è più disponibile nel percorso originale.");
             }
-        });
+        }
+    }
+});
     }
 
     /**
      * @brief Collega dinamicamente le colonne della TableView alle proprietà dei brani.
-     * @details Configura le fabbriche delle celle (cell value factories) utilizzando espressioni lambda.
+     * @details Configura le formattazioni di testo per ogni colonna e genera dinamicamente 
+     * un pulsante di eliminazione per la colonna delle azioni.
      */
     private void setupTableView() {
         titleCol.setCellValueFactory(data -> new SimpleStringProperty("♫   " + data.getValue().getTitle()));
@@ -119,7 +124,6 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
             return new SimpleStringProperty(String.format("%d:%02d", totalSeconds / 60, totalSeconds % 60));
         });
 
-        // Inserisce un pulsante cestino interattivo all'interno dell'ultima colonna delle azioni
         actionCol.setCellFactory(col -> new TableCell<>() {
             private final Button deleteBtn = new Button("🗑");
             {
@@ -137,19 +141,24 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
         });
     }
 
-    /* Observer */
-
+    /**
+     * @brief Callback invocata quando la libreria delle playlist subisce una modifica.
+     * @details Scatena l'aggiornamento visivo della tabella e dei contatori.
+     */
     @Override
     public void onPlaylistLibraryChanged() { 
         refresh(); 
     }
 
+    /**
+     * @brief Callback invocata quando il player audio cambia stato.
+     * @details Permette di mantenere sincronizzata l'icona Play/Pausa dell'intestazione.
+     * @param state Lo stato globale di riproduzione.
+     */
     @Override
     public void update(PlaybackState state) { 
         updateHeaderPlayButton(); 
     }
-
-    /* Aggiornamento UI */
 
     /**
      * @brief Svuota e ricarica i dati delle righe della tabella e delle etichette informative.
@@ -177,13 +186,13 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
         }
     }
 
-    /* Gestione pulsanti */
-
     /**
+     * @throws FileNotFoundException 
      * @brief Gestisce l'avvio della riproduzione dell'intera playlist o il cambio di stato pausa/play.
+     * @param event L'evento di click sul pulsante circolare di Playback nell'intestazione.
      */
     @FXML
-    private void handlePlayPlaylist(ActionEvent event) {
+    private void handlePlayPlaylist(ActionEvent event) throws FileNotFoundException {
         if (currentPlaylist == null || currentPlaylist.getTracks().isEmpty()) {
             showAlert(AlertType.WARNING, "Empty Playlist", "This playlist has no tracks to play.");
             return;
@@ -198,21 +207,25 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
             }
         } else {
             try {
-                playbackController.play(currentPlaylist);
-            } catch (IllegalArgumentException e) {
-                showAlert(AlertType.ERROR, "Playback Error", e.getMessage());
-            }
+            playbackController.play(currentPlaylist);
+        } catch (IllegalArgumentException e) {
+            showAlert(AlertType.ERROR, "Playback Error", e.getMessage());
+        } catch (FileNotFoundException e) {
+            showAlert(AlertType.ERROR, "File Not Found", 
+                "La traccia non è più disponibile nel percorso originale.");
+        }
         }
     }
 
     /**
      * @brief Apre la schermata della libreria globale per consentire l'aggiunta di un nuovo brano.
+     * @param event L'evento generato dal click sul pulsante "Aggiungi Traccia".
      */
     @FXML
     private void handleAddTrack(ActionEvent event) {
         try {
             TrackLibraryViewController controller = App.setRootAndGetController("library/TrackLibraryView");
-            controller.initSelectionMode(this.currentPlaylist, this.playlistController);
+            controller.initSelectionMode(this.currentPlaylist);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -220,7 +233,8 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
 
     /**
      * @brief Rimuove gli osservatori e ritorna in modo sicuro alla schermata Home.
-     * @details Previene i memory leak scollegando sia questo controller che il sotto-controller del player.
+     * @details Previene memory leak deregistrando il controller e arrestando il widget media player.
+     * @param event L'evento generato dal click sul pulsante "Indietro".
      */
     @FXML
     private void handleGoBack(ActionEvent event) {
@@ -236,10 +250,9 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
         }
     }
 
-    /* Pop-up */
-
     /**
      * @brief Chiede conferma all'utente ed elimina il brano selezionato dalla playlist.
+     * @param track La traccia da rimuovere.
      */
     private void handleRemoveTrack(Track track) {
         if (track == null) return;
@@ -248,9 +261,7 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
         confirm.setTitle("Confirm Removal");
         confirm.setHeaderText("Remove Track");
         confirm.setContentText("Are you sure you want to remove \"" + track.getTitle() + "\"?");
-
         DialogUtils.personalizza(confirm, trackTable, "🗑", "#FF4C30");
-
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             playlistController.removeTrackFromPlaylist(track, currentPlaylist);
@@ -260,6 +271,9 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
 
     /**
      * @brief Crea e mostra una finestra di avviso o errore personalizzata con il tema scuro.
+     * @param type Il tipo di Alert (WARNING, ERROR, ecc.).
+     * @param title Il titolo della finestra di dialogo.
+     * @param message Il messaggio dettagliato da mostrare all'utente.
      */
     private void showAlert(AlertType type, String title, String message) {
         Alert alert = new Alert(type, message, ButtonType.OK);
