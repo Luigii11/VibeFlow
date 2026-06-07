@@ -37,7 +37,7 @@ public class PlaybackStateTest {
      */
     @Test
     public void testSetCurrentTrackUpdatesTrack() {
-        Track track = new Track("Bohemian Rhapsody", "Queen", 354, "Rock", 1975);
+        Track track = new Track("Bohemian Rhapsody", "Queen", 354, "Rock", 1975, null);
         state.setCurrentTrack(track);
         assertEquals(track, state.getCurrentTrack(),
             "getCurrentTrack() deve restituire la traccia impostata con setCurrentTrack()");
@@ -59,7 +59,7 @@ public class PlaybackStateTest {
      */
     @Test
     public void testSetTrackAndPlayingStateAreIndependent() {
-        Track track = new Track("Imagine", "John Lennon", 187, "Pop", 1971);
+        Track track = new Track("Imagine", "John Lennon", 187, "Pop", 1971, "");
         state.setCurrentTrack(track);
         state.changeState(new PlayingState());
 

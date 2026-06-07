@@ -68,7 +68,7 @@ public class PlaylistDetailsControllerTest {
         testPlaylistController.createPlaylist("La mia playlist");
         currentPlaylist = testPlaylistLibrary.getPlaylists().get(0);
 
-        existingTrack = new Track("Napule è", "Pino Daniele", 227, "Pop", 1977);
+        existingTrack = new Track("Napule è", "Pino Daniele", 227, "Pop", 1977, null);
         testPlaylistController.addTrackToPlaylist(existingTrack, currentPlaylist);
     }
 
@@ -79,7 +79,7 @@ public class PlaylistDetailsControllerTest {
      */
     @Test
     public void testAddTrackToPlaylist_success() {
-        Track newTrack = new Track("Je so' pazzo", "Pino Daniele", 223, "Blues", 1979);
+        Track newTrack = new Track("Je so' pazzo", "Pino Daniele", 223, "Blues", 1979, null);
 
         testPlaylistController.addTrackToPlaylist(newTrack, currentPlaylist);
 
@@ -125,7 +125,7 @@ public class PlaylistDetailsControllerTest {
      */
     @Test
     public void testRemoveTrackFromPlaylist_otherTracksUntouched() {
-        Track secondTrack = new Track("Quanno chiove", "Pino Daniele", 275, "Blues", 1980);
+        Track secondTrack = new Track("Quanno chiove", "Pino Daniele", 275, "Blues", 1980, null);
         testPlaylistController.addTrackToPlaylist(secondTrack, currentPlaylist);
 
         testPlaylistController.removeTrackFromPlaylist(existingTrack, currentPlaylist);
@@ -144,7 +144,7 @@ public class PlaylistDetailsControllerTest {
      */
     @Test
     public void testRemoveTrackFromPlaylist_trackNotPresentThrowsException() {
-        Track notInPlaylist = new Track("Albachiara", "Vasco Rossi", 240, "Rock", 1984);
+        Track notInPlaylist = new Track("Albachiara", "Vasco Rossi", 240, "Rock", 1984, null);
 
         assertThrows(IllegalArgumentException.class, () ->
                 testPlaylistController.removeTrackFromPlaylist(notInPlaylist, currentPlaylist),
@@ -173,8 +173,8 @@ public class PlaylistDetailsControllerTest {
      */
     @Test
     public void testTrackCount_afterAddAndRemove() {
-        Track t2 = new Track("Je so' pazzo", "Pino Daniele", 223, "Blues", 1979);
-        Track t3 = new Track("Quanno chiove", "Pino Daniele", 275, "Blues", 1980);
+        Track t2 = new Track("Je so' pazzo", "Pino Daniele", 223, "Blues", 1979, null);
+        Track t3 = new Track("Quanno chiove", "Pino Daniele", 275, "Blues", 1980, null);
 
         testPlaylistController.addTrackToPlaylist(t2, currentPlaylist);
         testPlaylistController.addTrackToPlaylist(t3, currentPlaylist);

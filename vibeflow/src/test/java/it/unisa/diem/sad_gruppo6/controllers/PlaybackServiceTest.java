@@ -45,7 +45,7 @@ public class PlaybackServiceTest {
         state.setCurrentTrack(null);
 
         // Traccia di durata 5 secondi per rendere i test veloci e precisi
-        testTrack = new Track("Test Song", "Test Artist", 5, "Pop", 2000);
+        testTrack = new Track("Test Song", "Test Artist", 5, "Pop", 2000, null);
     }
 
 

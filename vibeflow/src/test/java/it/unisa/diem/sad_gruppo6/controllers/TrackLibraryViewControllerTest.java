@@ -74,7 +74,7 @@ public class TrackLibraryViewControllerTest {
     @Test
     public void testOnTrackAdded_libraryContainsTrackWithCorrectMetadata() {
 
-    Track track = new Track("Albachiara", "Vasco Rossi", 240, "Rock", 1984);
+    Track track = new Track("Albachiara", "Vasco Rossi", 240, "Rock", 1984, null);
     testLibrary.addTrack(track);
 
     List<Track> tracks = testLibrary.getTracks();
@@ -95,9 +95,9 @@ public class TrackLibraryViewControllerTest {
 
     @Test
     public void testOnTrackAdded_multipleTracksAllRetrievable() {
-    testLibrary.addTrack(new Track("Napule è", "Pino Daniele", 227, "Pop", 1977));
-    testLibrary.addTrack(new Track("Je so' pazzo", "Pino Daniele", 223, "Blues", 1979));
-    testLibrary.addTrack(new Track("Quanno chiove", "Pino Daniele", 275, "Blues", 1980));
+    testLibrary.addTrack(new Track("Napule è", "Pino Daniele", 227, "Pop", 1977, null));
+    testLibrary.addTrack(new Track("Je so' pazzo", "Pino Daniele", 223, "Blues", 1979, null));
+    testLibrary.addTrack(new Track("Quanno chiove", "Pino Daniele", 275, "Blues", 1980, null));
 
     List<Track> tracks = testLibrary.getTracks();
 
@@ -110,7 +110,7 @@ public class TrackLibraryViewControllerTest {
      */
     @Test
     public void testDurationFormat_isCorrectlyComputed() {
-    Track track = new Track("Yesterday", "The Beatles", 125, "Pop", 1975);
+    Track track = new Track("Yesterday", "The Beatles", 125, "Pop", 1975, null);
 
     int min = track.getDuration() / 60;
     int sec = track.getDuration() % 60;
@@ -126,7 +126,7 @@ public class TrackLibraryViewControllerTest {
      */
     @Test
     public void testOnTrackAdded_libraryIsUpdatedBeforeNotification() {
-    Track track = new Track("Amore senza fine", "Pino Daniele", 259, "Pop/Soul", 1998);
+    Track track = new Track("Amore senza fine", "Pino Daniele", 259, "Pop/Soul", 1998, null);
     testLibrary.addTrack(track); // la libreria si aggiorna prima della notifica
 
     testController.onTrackAdded(track); // il controller viene notificato
