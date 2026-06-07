@@ -3,7 +3,7 @@
  * @brief Controller per la barra del player audio globale.
  * @details Mantiene il nome originale ma implementa la logica di un componente riutilizzabile
  * che ascolta lo stato della riproduzione in background.
- * @author EmanuelChirico, LuigiAutorino
+ * @author EmanuelChirico, LuigiAutorino, ChiaraCrisci
  */
 package it.unisa.diem.sad_gruppo6.controller.ui.player;
 
@@ -11,6 +11,9 @@ import it.unisa.diem.sad_gruppo6.controller.business.playback.PlaybackController
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackObserver;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
+import it.unisa.diem.sad_gruppo6.model.playback.strategies.PlaybackMode;
+import it.unisa.diem.sad_gruppo6.model.playback.strategies.SequentialMode;
+import it.unisa.diem.sad_gruppo6.model.playback.strategies.ShuffleMode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -23,6 +26,7 @@ public class MediaPlayerController implements PlaybackObserver {
     @FXML private Label trackAuthorLabel;
     @FXML private Button playPauseButton;
     @FXML private Slider progressBar;
+    @FXML private Button shuffleButton;
 
     private PlaybackState playbackState;
     private PlaybackController playbackController;
@@ -74,6 +78,8 @@ public class MediaPlayerController implements PlaybackObserver {
         } else {
             playPauseButton.setText("⏵");
         }
+
+        updateShuffleButtonStyle();
     }
 
     @FXML
@@ -100,5 +106,56 @@ public class MediaPlayerController implements PlaybackObserver {
      */
     public void cleanup() {
         playbackState.removeObserver(this);
+    }
+
+    /**
+     * @brief Gestisce il click sul pulsante Shuffle, alternando tra modalità casuale
+     *        e sequenziale (toggle on/off).
+     *
+     * @details Se la modalità corrente è già {@link ShuffleMode}, la disattiva
+     *          ripristinando un {@link SequentialMode} posizionato sulla traccia
+     *          corrente (AC5). Altrimenti attiva lo Shuffle (AC1-AC3). In entrambi
+     *          i casi l'aggiornamento visivo del pulsante avviene tramite
+     *          {@link #updateShuffleButtonStyle()}, chiamato da {@link #refreshUI()}
+     *          in risposta alla notifica Observer.
+     *
+     * @param event L'evento JavaFX generato dal click sul pulsante.
+     */
+    @FXML
+    private void handleShuffle(ActionEvent event) {
+        PlaybackMode currentMode = playbackState.getMode();
+        PlaybackMode newMode;
+
+        if (currentMode instanceof ShuffleMode) {
+            // Shuffle attivo → disattiva, torna alla modalità sequenziale (AC4, AC5)
+            newMode = new SequentialMode();
+        } else {
+            // Shuffle non attivo → attiva la modalità casuale (AC1, AC2, AC3)
+            newMode = new ShuffleMode();
+        }
+
+        playbackController.setMode(newMode);
+    }
+
+    /**
+     * @brief Aggiorna lo stile grafico del pulsante Shuffle in base alla modalità attiva.
+     *
+     * @details Se la modalità corrente è {@link ShuffleMode}, aggiunge la CSS class
+     *          {@code "active"} al pulsante per evidenziarlo visivamente (AC2).
+     *          La rimozione della classe ripristina l'aspetto normale (AC5).
+     *
+     */
+    private void updateShuffleButtonStyle() {
+        if (shuffleButton == null) return;
+
+        boolean isShuffleActive = playbackState.getMode() instanceof ShuffleMode;
+
+        if (isShuffleActive) {
+            if (!shuffleButton.getStyleClass().contains("active")) {
+                shuffleButton.getStyleClass().add("active");
+            }
+        } else {
+            shuffleButton.getStyleClass().remove("active");
+        }
     }
 }

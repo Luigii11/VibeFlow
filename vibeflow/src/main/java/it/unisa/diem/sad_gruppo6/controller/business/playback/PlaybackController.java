@@ -5,7 +5,7 @@
  * fisico di riproduzione (PlaybackService), garantendo che ci sia sempre un unico flusso audio attivo.
  * @see PlaybackState
  * @see PlaybackService
- * @author EmanuelChirico, LuigiAutorino
+ * @author EmanuelChirico, LuigiAutorino, ChiaraCrisci
  */
 
 package it.unisa.diem.sad_gruppo6.controller.business.playback;
@@ -15,6 +15,9 @@ import it.unisa.diem.sad_gruppo6.model.domain.Track;
 import it.unisa.diem.sad_gruppo6.model.playback.iterators.PlaylistIterator;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PlayingState;
+import it.unisa.diem.sad_gruppo6.model.playback.strategies.PlaybackMode;
+import it.unisa.diem.sad_gruppo6.model.playback.strategies.SequentialMode;
+import it.unisa.diem.sad_gruppo6.model.playback.strategies.ShuffleMode;
 import it.unisa.diem.sad_gruppo6.model.service.PlaybackService;
 
 import java.util.List;
@@ -79,6 +82,7 @@ public class PlaybackController {
         if (tracks == null || tracks.isEmpty()) {
             throw new IllegalArgumentException("Empty list, impossible to play it.");
         }
+        playbackState.setCurrentTrackList(tracks);
         PlaylistIterator iterator = playbackState.getMode().getIterator(tracks, startTrack);
         playbackState.setIterator(iterator);
         startPlayback(startTrack);
@@ -131,5 +135,35 @@ public class PlaybackController {
         if (playbackState != null) {
             playbackState.previous();
         }
+    }
+
+    /**
+     * @brief Imposta la modalità di riproduzione attiva e aggiorna l'iteratore corrente.
+     *
+     * @details Quando l'utente attiva o disattiva la modalità Shuffle, questo metodo
+     *          sostituisce la {@link PlaybackMode} nel {@link PlaybackState} e ricrea
+     *          immediatamente l'iteratore a partire dalla traccia attualmente in ascolto,
+     *          in modo che la modalità abbia effetto dal brano successivo senza
+     *          interrompere né riavviare la riproduzione corrente.
+     *          In conformità con l'acceptance criteria, l'ordine
+     *          originale della playlist non viene mai alterato.
+     *
+     * @param mode La nuova {@link PlaybackMode} da adottare (es. {@link ShuffleMode}
+     *             o {@link SequentialMode}).
+     */
+    public void setMode(PlaybackMode mode) {
+    if (mode == null) {
+        throw new IllegalArgumentException("PlaybackMode cannot be null.");
+    }
+
+    playbackState.setMode(mode);
+
+    List<Track> tracks = playbackState.getCurrentTrackList();
+    Track currentTrack = playbackState.getCurrentTrack();
+
+    if (tracks != null && !tracks.isEmpty()) {
+        PlaylistIterator newIterator = mode.getIterator(tracks, currentTrack);
+        playbackState.setIterator(newIterator);
+    }
     }
 }
