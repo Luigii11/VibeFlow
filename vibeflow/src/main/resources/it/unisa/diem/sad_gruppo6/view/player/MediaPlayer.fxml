@@ -24,7 +24,7 @@
                 <Region HBox.hgrow="ALWAYS" />
                 <HBox alignment="CENTER" spacing="25.0">
                     <children>
-                        <Button mnemonicParsing="false" styleClass="player-btn, icon-small" text="🔀" />
+                        <Button fx:id="shuffleButton" mnemonicParsing="false" onAction="#handleShuffle" styleClass="player-btn, icon-small" text="🔀" />
                         <Button mnemonicParsing="false" onAction="#handlePrevious" styleClass="player-btn, icon-medium" text="⏮" />
                         <Button fx:id="playPauseButton" mnemonicParsing="false" onAction="#handlePlayPause" styleClass="play-pause-btn" text="⏵" />
                         <Button mnemonicParsing="false" onAction="#handleNext" styleClass="player-btn, icon-medium" text="⏭" />

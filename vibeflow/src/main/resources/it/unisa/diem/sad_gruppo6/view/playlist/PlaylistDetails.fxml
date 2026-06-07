@@ -41,9 +41,10 @@
                         </VBox>
                         <Region HBox.hgrow="ALWAYS" />
                         
-                        <VBox alignment="CENTER">
+                        <VBox alignment="CENTER" spacing="8.0">
                             <children>
                                 <Button fx:id="playlistPlayPauseButton" mnemonicParsing="false" onAction="#handlePlayPlaylist" styleClass="player-btn, play-playlist-circle-btn" text="▶" />
+                                <Button fx:id="playlistShuffleButton" mnemonicParsing="false" onAction="#handlePlaylistShuffle" styleClass="player-btn, icon-small" text="🔀" />
                             </children>
                         </VBox>
                     </children>
