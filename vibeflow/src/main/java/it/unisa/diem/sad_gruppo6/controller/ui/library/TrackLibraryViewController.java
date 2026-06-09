@@ -369,9 +369,33 @@ public class TrackLibraryViewController implements TrackLibraryObserver {
             Scene scene = new Scene(root);
             scene.setFill(javafx.scene.paint.Color.TRANSPARENT); 
             dialogStage.setScene(scene);
+            
+            Track playingTrack = playbackState.getCurrentTrack();
+            boolean isPlaying = (playingTrack != null && playingTrack.equals(track));
+            boolean wasAudioActive = "Playing".equals(playbackState.getStatusName());
+            int trackIndexBefore = library.getTracks().indexOf(track);
+            String oldMp3Path = track.getPath();
+
             dialogStage.showAndWait(); 
             onLibraryChanged();
             
+            // GESTIONE INTELLIGENTE DEL RIAVVIO
+            if (isPlaying && trackIndexBefore != -1) {
+
+                if (trackIndexBefore < library.getTracks().size()) {
+                    Track updatedTrack = library.getTracks().get(trackIndexBefore);
+                    String newMp3Path = updatedTrack.getPath();
+                    playbackState.setCurrentTrack(updatedTrack);
+
+                    if (oldMp3Path != null && !oldMp3Path.equals(newMp3Path)) {
+                        it.unisa.diem.sad_gruppo6.model.service.PlaybackService.getInstance().start();
+                        
+                        if (!wasAudioActive) {
+                            playbackController.pause();
+                        }
+                    }
+                }
+            }
         } catch (IOException e) {
             showError("UI Error", "Could not load the track editing dialog.");
             e.printStackTrace();
