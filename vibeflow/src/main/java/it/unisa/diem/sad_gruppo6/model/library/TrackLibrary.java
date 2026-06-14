@@ -182,5 +182,19 @@ public class TrackLibrary
         notifyTrackAdded(track);
         notifyObserver();
     }
+
+    /**
+     * @brief Notifica tutti gli observer che una traccia ha subito una modifica "leggera"
+     * (es. cambio dei tag) senza alterare l'ordine o l'identità della traccia in libreria.
+     * @details Usato da TrackController.addTag()/removeTag() per propagare
+     * l'aggiornamento dello stato del TagSet alla UI tramite notifyObserver(),
+     * in linea con il requisito "lo stato dell'icona si aggiorna istantaneamente".
+     *
+     * @param track La traccia il cui stato è stato aggiornato.
+     */
+    public void notifyTrackUpdated(Track track)
+    {
+        notifyObserver();
+    }
   
 }
