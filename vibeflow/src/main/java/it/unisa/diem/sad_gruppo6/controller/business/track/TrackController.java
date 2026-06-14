@@ -163,7 +163,7 @@ public class TrackController
         }
         track.getTagSet().addTag(tag);
         library.notifyTrackUpdated(track);
-        playlistController.createAutoPlaylist(tag);
+
         if (tag != Tag.FAVOURITE) {
             playlistController.createAutoPlaylist(tag);
         }
@@ -173,7 +173,7 @@ public class TrackController
      * @brief Rimuove un tag gestibile dall'utente da una traccia.
      * @details Delega al TagSet della traccia, notifica gli
      * observer della libreria affinché la UI aggiorni istantaneamente lo stato
-     * dell'icona (AC6), aggiorna la playlist automatica corrispondente al tag
+     * dell'icona, aggiorna la playlist automatica corrispondente al tag
      * e, se nessuna traccia possiede più il tag, la rimuove dalla PlaylistLibrary.
      *
      * @param track La traccia da cui rimuovere il tag.
@@ -188,8 +188,6 @@ public class TrackController
         }
         track.getTagSet().removeTag(tag);
         library.notifyTrackUpdated(track);
-        playlistController.createAutoPlaylist(tag);
-        playlistController.removeTagPlaylistIfEmpty(tag);
 
         if (tag != Tag.FAVOURITE) {
             playlistController.createAutoPlaylist(tag);

@@ -83,7 +83,7 @@
 
                 <HBox alignment="CENTER_RIGHT">
                     <children>
-                        <Button mnemonicParsing="false" onAction="#handleAddTrack" styleClass="add-btn" text="+ Add a track" />
+                        <Button fx:id="addTrackButton" mnemonicParsing="false" onAction="#handleAddTrack" styleClass="add-btn" text="+ Add a track" />
                     </children>
                 </HBox>
             </children>

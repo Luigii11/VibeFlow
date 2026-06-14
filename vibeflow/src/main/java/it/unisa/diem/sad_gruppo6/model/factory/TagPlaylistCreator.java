@@ -68,8 +68,7 @@ public class TagPlaylistCreator extends PlaylistCreator {
                 playlist.addTrack(t);
             }
         }
-
-        // Se nessuna traccia possiede il tag, non restituiamo una playlist vuota
+        
         if (playlist.getTracks().isEmpty()) {
             return null;
         }
