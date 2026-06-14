@@ -7,15 +7,19 @@
 
 package it.unisa.diem.sad_gruppo6.controller.business.track;
 
+import java.time.LocalDate;
+
 import it.unisa.diem.sad_gruppo6.controller.business.playlist.PlaylistController;
 import it.unisa.diem.sad_gruppo6.model.command.AddTrackToLibraryCommand;
 import it.unisa.diem.sad_gruppo6.model.command.CommandManager;
 import it.unisa.diem.sad_gruppo6.model.command.EditTrackCommand;
 import it.unisa.diem.sad_gruppo6.model.command.RemoveTrackFromLibraryCommand;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
+import it.unisa.diem.sad_gruppo6.model.domain.Tag;
 import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibrary;
 import it.unisa.diem.sad_gruppo6.model.library.TrackLibrary;
 import it.unisa.diem.sad_gruppo6.utility.AudioMetadataExtractor;
+import java.util.Random;
 
 public class TrackController 
 {
@@ -23,7 +27,8 @@ public class TrackController
     private CommandManager commandManager;
     private Track trackToEdit;  
     private PlaylistController playlistController;
-
+    private static final Random RANDOM = new Random();
+    
 
     public TrackController() 
     {
@@ -36,14 +41,57 @@ public class TrackController
         );
     }
 
+/**
+     * @brief Crea una nuova traccia, la aggiunge alla libreria e assegna i tag di sistema.
+     * @details Dopo la costruzione della Track, assegna automaticamente Tag.NEW_RELEASE
+     * se l'anno di pubblicazione coincide con l'anno corrente.
+     * L'assegnazione di Tag.EXPLICIT è demandata a {@link #assignSystemTags(Track, boolean)}
+     * e può essere richiesta dai metadati del file audio in una fase successiva
+     * (estensione futura senza modificare la firma pubblica del metodo).
+     * Questi tag non sono modificabili dall'utente, in coerenza con
+     * {@link it.unisa.diem.sad_gruppo6.model.domain.TagSet#setSystemTag(Tag)}.
+     *
+     * @param title Il titolo della traccia.
+     * @param author L'autore della traccia.
+     * @param genre Il genere musicale della traccia.
+     * @param year L'anno di pubblicazione della traccia.
+     * @param path Il percorso del file audio della traccia.
+     */
     public void createTrack(String title, String author, String genre, int year, String path) 
     {
         int length = AudioMetadataExtractor.extractDuration(path);
         Track track = new Track(title, author, length, genre, year, path);
+
+        boolean explicit = RANDOM.nextBoolean();
+        assignSystemTags(track, explicit);
+
         AddTrackToLibraryCommand command = new AddTrackToLibraryCommand(library, track);
         commandManager.execute(command);
         playlistController.createAutoPlaylist(genre);
         playlistController.createAutoPlaylist(year);
+    }
+
+    /**
+     * @brief Assegna i tag di sistema (EXPLICIT, NEW_RELEASE) a una traccia appena creata.
+     * @details Centralizza l'invariante "i tag di sistema vengono assegnati una sola volta,
+     * in fase di creazione, e non sono modificabili dall'utente".
+     * NEW_RELEASE viene assegnato se l'anno della traccia coincide con l'anno corrente;
+     * EXPLICIT viene assegnato se il chiamante lo segnala tramite il parametro {@code explicit},
+     * tipicamente derivato dai metadati del file audio.
+     *
+     * @param track La traccia appena costruita, non ancora aggiunta alla libreria.
+     * @param explicit true se i metadati della traccia indicano contenuto esplicito.
+     */
+    private void assignSystemTags(Track track, boolean explicit)
+    {
+        if (explicit)
+        {
+            track.getTagSet().setSystemTag(Tag.EXPLICIT);
+        }
+        if (track.getYear() == LocalDate.now().getYear())
+        {
+            track.getTagSet().setSystemTag(Tag.NEW_RELEASE);
+        }
     }
 
    
@@ -90,6 +138,46 @@ public class TrackController
         commandManager.execute(command);
         playlistController.removeGenrePlaylistIfEmpty(genre);
         playlistController.removeYearPlaylistIfEmpty(year);
+    }
+
+    /**
+     * @brief Aggiunge un tag gestibile dall'utente a una traccia.
+     * @details Delega al TagSet della traccia (ID_21, AC2) e notifica gli
+     * observer della libreria affinché la UI aggiorni istantaneamente
+     * lo stato dell'icona (AC6).
+     *
+     * @param track La traccia a cui aggiungere il tag.
+     * @param tag Il tag da assegnare (deve essere gestibile dall'utente, es. FAVOURITE).
+     * @throws IllegalArgumentException Se track è null o tag è un tag di sistema.
+     */
+    public void addTag(Track track, Tag tag)
+    {
+        if (track == null)
+        {
+            throw new IllegalArgumentException("La traccia non può essere null.");
+        }
+        track.getTagSet().addTag(tag);
+        library.notifyTrackUpdated(track);
+    }
+
+    /**
+     * @brief Rimuove un tag gestibile dall'utente da una traccia.
+     * @details Delega al TagSet della traccia (ID_21, AC3) e notifica gli
+     * observer della libreria affinché la UI aggiorni istantaneamente
+     * lo stato dell'icona (AC6).
+     *
+     * @param track La traccia da cui rimuovere il tag.
+     * @param tag Il tag da rimuovere (deve essere gestibile dall'utente, es. FAVOURITE).
+     * @throws IllegalArgumentException Se track è null o tag è un tag di sistema.
+     */
+    public void removeTag(Track track, Tag tag)
+    {
+        if (track == null)
+        {
+            throw new IllegalArgumentException("La traccia non può essere null.");
+        }
+        track.getTagSet().removeTag(tag);
+        library.notifyTrackUpdated(track);
     }
 
 }
