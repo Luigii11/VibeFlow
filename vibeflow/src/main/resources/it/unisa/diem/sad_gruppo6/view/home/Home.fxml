@@ -15,19 +15,20 @@
 
 <BorderPane prefHeight="760.0" prefWidth="1080.0" snapToPixel="true" styleClass="main-root" stylesheets="@/styles/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.diem.sad_gruppo6.controller.ui.home.HomeController">
    
-   <left>
-      <VBox alignment="TOP_CENTER" prefWidth="70.0" spacing="30.0" styleClass="sidebar" BorderPane.alignment="CENTER">
-         <padding>
-            <Insets bottom="20.0" top="30.0" />
-         </padding>
-         <Button mnemonicParsing="false" onAction="#handleGoToAllTracks" styleClass="sidebar-btn, icon-medium" text="☰" />
-         <Button mnemonicParsing="false" styleClass="sidebar-btn, icon-large, favorite-color" text="♥" />
-         
-         <Region VBox.vgrow="ALWAYS" />
-         
-         <Button mnemonicParsing="false" onAction="#handleGoToCreatePlaylist" styleClass="add-btn" text="+" />
-      </VBox>
-   </left>
+      <left>
+            <VBox alignment="TOP_CENTER" prefWidth="70.0" spacing="30.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+               <padding>
+                  <Insets bottom="20.0" top="30.0" />
+               </padding>
+               <Button mnemonicParsing="false" onAction="#handleGoToAllTracks" styleClass="sidebar-btn, icon-medium" text="☰" />
+               
+               <Button mnemonicParsing="false" onAction="#handleShowFavourites" styleClass="add-btn" text="♥" />
+               
+               <Region VBox.vgrow="ALWAYS" />
+               
+               <Button mnemonicParsing="false" onAction="#handleGoToCreatePlaylist" styleClass="add-btn" text="+" />
+            </VBox>
+         </left>
 
    <center>
       <ScrollPane fitToWidth="true" focusTraversable="false" hbarPolicy="NEVER" vbarPolicy="NEVER" styleClass="center-scroll-pane" BorderPane.alignment="CENTER">

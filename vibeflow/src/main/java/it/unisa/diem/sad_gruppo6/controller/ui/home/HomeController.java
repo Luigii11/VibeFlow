@@ -19,6 +19,9 @@ import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
 import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibrary;
 import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibraryObserver;
 import it.unisa.diem.sad_gruppo6.model.library.TrackLibrary;
+import it.unisa.diem.sad_gruppo6.model.domain.Tag;
+import it.unisa.diem.sad_gruppo6.model.factory.TagPlaylistCreator;
+import it.unisa.diem.sad_gruppo6.model.library.TrackLibrary;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -393,5 +396,29 @@ public class HomeController implements PlaylistLibraryObserver {
         alert.setHeaderText(titoloHeader);
         DialogUtils.personalizza(alert, playlistTilePane, "⚠", "#FF6E57");
         alert.showAndWait();
+    }
+
+    /**
+     * @brief Apre la vista "Preferiti": una Playlist virtuale, calcolata al volo
+     * tramite TagPlaylistCreator, contenente tutte le tracce con il tag FAVOURITE.
+     * @details A differenza delle playlist automatiche per genere/anno/EXPLICIT/NEW_RELEASE,
+     * la playlist FAVOURITE non viene mai inserita nella PlaylistLibrary e quindi
+     * non genera una card tra le "Automatic Playlists": viene ricostruita
+     * ogni volta che l'utente apre questa vista, garantendo che sia sempre aggiornata.
+     * Se nessuna traccia è contrassegnata come preferita, mostra un avviso.
+     *
+     * @param event L'evento generato dal click sul pulsante "Favourites".
+     */
+    @FXML
+    private void handleShowFavourites(ActionEvent event) {
+        TagPlaylistCreator creator = new TagPlaylistCreator(Tag.FAVOURITE);
+        Playlist favourites = creator.createPlaylist(TrackLibrary.getInstance().getTracks());
+
+        if (favourites == null) {
+            showErrorAlert("No favourites yet", "You haven't marked any track as favourite.");
+            return;
+        }
+
+        openPlaylistDetails(favourites);
     }
 }
