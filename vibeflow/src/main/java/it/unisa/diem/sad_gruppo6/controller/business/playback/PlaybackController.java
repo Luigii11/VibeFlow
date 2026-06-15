@@ -156,7 +156,16 @@ public class PlaybackController {
      */
     public void resume() {
         playbackState.play();
-        playbackService.resume();
+        if (playbackService.hasPlayer()) {
+            playbackService.resume();
+        } else {
+            try {
+                playbackService.start();
+                playbackService.setOnEndOfTrack(() -> onTrackEnded());
+            } catch (FileNotFoundException e) {
+                stop();
+            }
+        }
     }
         public void stop() 
     {

@@ -20,12 +20,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
+import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackObserver;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
 import javafx.application.Platform;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.Media;
 
-public class PlaybackService {
+public class PlaybackService implements PlaybackObserver {
 
     /* Attributi */
     private PlaybackState playbackState;
@@ -33,6 +34,7 @@ public class PlaybackService {
     private static PlaybackService instance;
     private MediaPlayer player;
     private Runnable onFileNotFoundCallback;
+    private Runnable onEndOfTrackCallback;
 
     /**
      * @brief Costruttore privato per implementare il pattern Singleton. 
@@ -40,7 +42,32 @@ public class PlaybackService {
      */
 
     private PlaybackService() {
-        this.playbackState = PlaybackState.getInstance();  
+        this.playbackState = PlaybackState.getInstance();
+        this.playbackState.registerObserver(this);
+    }
+
+    /**
+     * Reagisce automaticamente quando la traccia corrente cambia in PlaybackState.
+     * Se il player è attivo e il path dell'audio è diverso da quello caricato,
+     * ferma il player e riavvia con il nuovo file (se stava suonando).
+     * Il guard su player == null evita il doppio-start durante startPlayback(),
+     * che chiama stop() prima di setCurrentTrack().
+     */
+    @Override
+    public void update(PlaybackState state) {
+        Track newTrack = state.getCurrentTrack();
+        if (newTrack == null || player == null) return;
+        if (currentTrack != null && currentTrack.getPath().equals(newTrack.getPath())) return;
+
+        boolean wasPlaying = "Playing".equals(state.getStatusName());
+        stop();
+        if (wasPlaying) {
+            try {
+                start();
+            } catch (FileNotFoundException e) {
+                notifyFileNotFound();
+            }
+        }
     }
     
     /**
@@ -79,6 +106,10 @@ public class PlaybackService {
         player = new MediaPlayer(playbleSong);
 
         player.setOnError(() -> notifyFileNotFound());
+
+        if (onEndOfTrackCallback != null) {
+            player.setOnEndOfMedia(onEndOfTrackCallback);
+        }
 
         player.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
             int seconds = (int) newTime.toSeconds();
@@ -129,10 +160,15 @@ public class PlaybackService {
 
     public void setOnEndOfTrack(Runnable callback)
     {
+        this.onEndOfTrackCallback = callback;
         if (player != null)
         {
             player.setOnEndOfMedia(callback);
         }
+    }
+
+    public boolean hasPlayer() {
+        return player != null;
     }
 
     public void setOnFileNotFound(Runnable callback) {

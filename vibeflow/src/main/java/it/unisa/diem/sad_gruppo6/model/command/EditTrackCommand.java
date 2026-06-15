@@ -13,14 +13,16 @@
  */
 package it.unisa.diem.sad_gruppo6.model.command;
 
+import java.io.FileNotFoundException;
 import java.util.List;
-
 
 import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
 import it.unisa.diem.sad_gruppo6.model.library.TrackLibrary;
 import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibrary;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
+import it.unisa.diem.sad_gruppo6.model.playback.states.PausedState;
+import it.unisa.diem.sad_gruppo6.model.service.PlaybackService;
 
 public class EditTrackCommand implements AppCommand
 {

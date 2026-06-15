@@ -111,7 +111,7 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
                 Track selectedTrack = trackTable.getSelectionModel().getSelectedItem();
                 if (selectedTrack != null) {
                     try {
-                        playbackController.play(currentPlaylist.getTracks(), selectedTrack);
+                        playbackController.play(currentPlaylist, selectedTrack);
                     } catch (FileNotFoundException e) {
                         playbackController.stop();
                         showAlert(AlertType.ERROR, "File non trovato",
