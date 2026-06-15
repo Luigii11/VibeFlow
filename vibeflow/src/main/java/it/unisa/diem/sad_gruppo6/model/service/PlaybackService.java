@@ -123,11 +123,23 @@ public class PlaybackService {
         }
     }
 
-    public void setOnEndOfTrack(Runnable callback) 
+    public void setOnEndOfTrack(Runnable callback)
     {
         if (player != null)
         {
             player.setOnEndOfMedia(callback);
+        }
+    }
+
+    /**
+     * Sposta la riproduzione alla posizione specificata in secondi.
+     * @param seconds La posizione di destinazione in secondi.
+     */
+    public void seekTo(double seconds)
+    {
+        if (player != null)
+        {
+            player.seek(javafx.util.Duration.seconds(seconds));
         }
     }
 

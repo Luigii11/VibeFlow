@@ -21,11 +21,13 @@ import it.unisa.diem.sad_gruppo6.model.playback.strategies.PlaybackMode;
 import it.unisa.diem.sad_gruppo6.model.playback.strategies.SequentialMode;
 import it.unisa.diem.sad_gruppo6.model.playback.strategies.ShuffleMode;
 import it.unisa.diem.sad_gruppo6.model.service.PlaybackService;
+import it.unisa.diem.sad_gruppo6.controller.business.track.TrackController;
 
 public class PlaybackController {
 
     private PlaybackState playbackState;
     private PlaybackService playbackService;
+    private TrackController trackController;
 
     /**
      * Costruttore di default.
@@ -34,6 +36,7 @@ public class PlaybackController {
     public PlaybackController() {
         this.playbackState = PlaybackState.getInstance();
         this.playbackService = PlaybackService.getInstance();
+        this.trackController = new TrackController();
     }
 
     /**
@@ -44,6 +47,7 @@ public class PlaybackController {
     public PlaybackController(PlaybackState playbackState, PlaybackService playbackService) {
         this.playbackState = playbackState;
         this.playbackService = playbackService;
+        this.trackController = null;
     }
 
     /**
@@ -233,6 +237,16 @@ public class PlaybackController {
     }
 
     /**
+     * @brief Porta la riproduzione alla posizione specificata in secondi.
+     * @details Aggiorna lo stato logico (per la UI) e sposta fisicamente il MediaPlayer.
+     * @param seconds La posizione di destinazione in secondi.
+     */
+    public void seekTo(int seconds) {
+        playbackState.seekTo(seconds);
+        playbackService.seekTo(seconds);
+    }
+
+    /**
      * @brief Imposta la modalità di riproduzione attiva e aggiorna l'iteratore corrente.
      *
      * @details Sostituisce la {@link PlaybackMode} nel {@link PlaybackState} e ricrea
@@ -270,6 +284,9 @@ public class PlaybackController {
      */
     private void onTrackEnded() {
         Track previousTrack = playbackState.getCurrentTrack();
+        if (previousTrack != null && trackController != null) {
+            trackController.incrementPlayCount(previousTrack);
+        }
         playbackState.next();
         Track currentTrack = playbackState.getCurrentTrack();
 

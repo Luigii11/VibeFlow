@@ -38,6 +38,7 @@ public class MediaPlayerController implements PlaybackObserver {
 
     private PlaybackState playbackState;
     private PlaybackController playbackController;
+    private boolean userSeeking = false;
 
     /**
      * @brief Inizializzazione automatica del componente.
@@ -47,6 +48,15 @@ public class MediaPlayerController implements PlaybackObserver {
         this.playbackState = PlaybackState.getInstance();
         this.playbackController = new PlaybackController();
         this.playbackState.registerObserver(this);
+
+        progressBar.setOnMousePressed(e -> userSeeking = true);
+        progressBar.setOnMouseReleased(e -> {
+            userSeeking = false;
+            if (playbackState.getCurrentTrack() != null) {
+                playbackController.seekTo((int) progressBar.getValue());
+            }
+        });
+
         refreshUI();
     }
 
@@ -73,7 +83,9 @@ public class MediaPlayerController implements PlaybackObserver {
             
             if (totalDuration > 0) {
                 progressBar.setMax(totalDuration);
-                progressBar.setValue(currentPos);
+                if (!userSeeking) {
+                    progressBar.setValue(currentPos);
+                }
             } else {
                 progressBar.setValue(0);
             }

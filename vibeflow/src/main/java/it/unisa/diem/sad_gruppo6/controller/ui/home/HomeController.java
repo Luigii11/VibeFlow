@@ -21,7 +21,6 @@ import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibraryObserver;
 import it.unisa.diem.sad_gruppo6.model.library.TrackLibrary;
 import it.unisa.diem.sad_gruppo6.model.domain.Tag;
 import it.unisa.diem.sad_gruppo6.model.factory.TagPlaylistCreator;
-import it.unisa.diem.sad_gruppo6.model.library.TrackLibrary;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

@@ -26,7 +26,6 @@ import it.unisa.diem.sad_gruppo6.model.domain.Track;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PausedState;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PlayingState;
-import it.unisa.diem.sad_gruppo6.model.service.PlaybackService;
 
 public class PlaybackServiceTest {
 
