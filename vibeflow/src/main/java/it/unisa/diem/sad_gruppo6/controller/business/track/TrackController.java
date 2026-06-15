@@ -2,7 +2,7 @@
  * @file TrackController.java
  * Classe di definizione di un oggetto di tipo 'TrackController', controller per la gestione delle tracce musicali.
  * 
- * @author EmanuelChirico
+ * @author EmanuelChirico, ChiaraCrisci
  */
 
 package it.unisa.diem.sad_gruppo6.controller.business.track;
@@ -105,6 +105,11 @@ public class TrackController
         int oldYear = target.getYear();
         int length = AudioMetadataExtractor.extractDuration(path);
         Track updatedTrack = new Track(title, author, length, genre, year, path);
+        
+        if (target.getTagSet().hasTag(Tag.FAVOURITE)) {
+            updatedTrack.getTagSet().addTag(Tag.FAVOURITE);
+        }
+        assignSystemTags(updatedTrack, RANDOM.nextBoolean());
         EditTrackCommand command = new EditTrackCommand(target, updatedTrack);
         commandManager.execute(command);
 
@@ -114,6 +119,10 @@ public class TrackController
         }
 
         playlistController.createAutoPlaylist(genre);
+        playlistController.createAutoPlaylist(Tag.EXPLICIT);
+        playlistController.removeTagPlaylistIfEmpty(Tag.EXPLICIT);
+        playlistController.createAutoPlaylist(Tag.NEW_RELEASE);
+        playlistController.removeTagPlaylistIfEmpty(Tag.NEW_RELEASE);
 
         if (oldYear != year) {
           playlistController.createAutoPlaylist(oldYear);
@@ -142,6 +151,7 @@ public class TrackController
         if (!library.getTracks().contains(track)) {
             throw new IllegalArgumentException("La traccia da rimuovere non è presente in libreria.");
         }
+
         String genre = track.getGenre();
         int year = track.getYear();
         // Incapsula l'azione nel comando richiesto dal task
@@ -151,6 +161,13 @@ public class TrackController
         playlistController.removeYearPlaylistIfEmpty(year);
         playlistController.removeTopPlayedPlaylistIfEmpty();
         playlistController.createAutoMostPlayedPlaylist();
+
+        for (Tag t : track.getTagSet().getTags()) {
+            if (t != Tag.FAVOURITE) {
+                playlistController.createAutoPlaylist(t);
+                playlistController.removeTagPlaylistIfEmpty(t);
+            }
+        }
     }
 
     /**
