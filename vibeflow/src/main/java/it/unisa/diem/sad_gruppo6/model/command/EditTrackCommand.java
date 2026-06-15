@@ -16,8 +16,10 @@ package it.unisa.diem.sad_gruppo6.model.command;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import it.unisa.diem.sad_gruppo6.controller.business.playlist.PlaylistController;
 import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
+import it.unisa.diem.sad_gruppo6.model.domain.Tag;
 import it.unisa.diem.sad_gruppo6.model.library.TrackLibrary;
 import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibrary;
 import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
@@ -28,6 +30,7 @@ public class EditTrackCommand implements AppCommand
 {
     private final TrackLibrary library;
     private final PlaylistLibrary playlistLibrary;
+    private final PlaylistController playlistController;
     private final Track oldTrack;
     private final Track updatedTrack;
 
@@ -42,6 +45,7 @@ public class EditTrackCommand implements AppCommand
         // Utilizza il Singleton strutturato da Luigi
         this.library      = TrackLibrary.getInstance();
         this.playlistLibrary = PlaylistLibrary.getInstance();
+        this.playlistController = new PlaylistController(this.library, this.playlistLibrary, CommandManager.getInstance());
         this.oldTrack     = oldTrack;
         this.updatedTrack = updatedTrack;
     }
@@ -65,6 +69,8 @@ public class EditTrackCommand implements AppCommand
                 tracksInPlaylist.set(index, updatedTrack);
             }
         }
+
+        syncAutoPlaylists(oldTrack, updatedTrack);
         
         playlistLibrary.updatePlaylist(null);
 
@@ -88,11 +94,51 @@ public class EditTrackCommand implements AppCommand
             }
         }
 
+        syncAutoPlaylists(updatedTrack, oldTrack);
+
         playlistLibrary.updatePlaylist(null);
 
         PlaybackState playbackState = PlaybackState.getInstance();
         if (playbackState.getCurrentTrack() == updatedTrack) {
             playbackState.setCurrentTrack(oldTrack);
         }
+    }
+
+
+    /**
+     * Ricalcola le playlist automatiche (genere, decade, EXPLICIT, NEW_RELEASE)
+     * dopo che 'from' è stata sostituita da 'to' nella TrackLibrary.
+     * @details Centralizza qui la logica già usata da TrackController#editTrack,
+     * in modo che venga eseguita simmetricamente sia in execute() che in undo():
+     * crea/aggiorna le playlist automatiche relative ai metadati di 'to' e,
+     * se genere o decade sono cambiati rispetto a 'from', rimuove le
+     * corrispondenti playlist automatiche di 'from' qualora rimangano vuote.
+     *
+     * @param from la traccia precedente (prima della sostituzione).
+     * @param to   la traccia subentrante (dopo la sostituzione).
+     */
+    private void syncAutoPlaylists(Track from, Track to)
+    {
+        String fromGenre = from.getGenre();
+        String toGenre = to.getGenre();
+        int fromYear = from.getYear();
+        int toYear = to.getYear();
+
+        if (!fromGenre.equalsIgnoreCase(toGenre)) {
+            playlistController.createAutoPlaylist(fromGenre);
+            playlistController.removeGenrePlaylistIfEmpty(fromGenre);
+        }
+
+        playlistController.createAutoPlaylist(toGenre);
+        playlistController.createAutoPlaylist(Tag.Explicit);
+        playlistController.removeTagPlaylistIfEmpty(Tag.Explicit);
+        playlistController.createAutoPlaylist(Tag.NewRelease);
+        playlistController.removeTagPlaylistIfEmpty(Tag.NewRelease);
+
+        if (fromYear != toYear) {
+            playlistController.createAutoPlaylist(fromYear);
+            playlistController.removeYearPlaylistIfEmpty(fromYear);
+        }
+        playlistController.createAutoPlaylist(toYear);
     }
     }
