@@ -358,6 +358,7 @@ public class HomeController implements PlaylistLibraryObserver {
             
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Create new playlist");
+            DialogUtils.setWindowIcon(dialogStage);
             dialogStage.setScene(new Scene(root));
             Stage owner = (Stage) ((Node) event.getSource()).getScene().getWindow();
             dialogStage.initOwner(owner);

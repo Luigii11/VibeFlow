@@ -114,7 +114,7 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
                         playbackController.play(currentPlaylist.getTracks(), selectedTrack);
                     } catch (FileNotFoundException e) {
                         showAlert(AlertType.ERROR, "File Not Found", 
-                            "La traccia non è più disponibile nel percorso originale.");
+                            "The track is no longer available at the original file location.");
                     }
                 }
             }
@@ -243,9 +243,9 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
                         playlistController.reorderTrack(draggedTrack, currentPlaylist, dropIndex);
                         success = true;
                     } catch (IllegalArgumentException ex) {
-                        showAlert(AlertType.WARNING, "Operazione non consentita", ex.getMessage());
+                        showAlert(AlertType.WARNING, "Operation denied.", ex.getMessage());
                     } catch (Exception ex) {
-                        showAlert(AlertType.ERROR, "Errore di Salvataggio", ex.getMessage());
+                        showAlert(AlertType.ERROR, "Saving error:", ex.getMessage());
                         refresh(); 
                     }
                 }
@@ -350,7 +350,7 @@ public class PlaylistDetailsController implements PlaylistLibraryObserver, Playb
                 showAlert(AlertType.ERROR, "Playback Error", e.getMessage());
             } catch (FileNotFoundException e) {
                 showAlert(AlertType.ERROR, "File Not Found", 
-                    "La traccia non è più disponibile nel percorso originale.");
+                    "The track is no longer available at the original file location.");
             }
         }
     }

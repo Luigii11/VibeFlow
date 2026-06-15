@@ -54,7 +54,7 @@ public class TrackLibrary
     {
         if (tracks.contains(track))
         {
-            throw new IllegalArgumentException("Impossibile aggiungere la traccia: una traccia con lo stesso titolo e autore è già presente in libreria!");
+            throw new IllegalArgumentException("Error adding track: a track with the same title and author already exists in the library.");
         }
         else
         {
@@ -138,7 +138,7 @@ public class TrackLibrary
     {
         if (oldTrack == null || !tracks.contains(oldTrack))
         {
-            throw new IllegalArgumentException("La traccia da aggiornare non è presente in libreria.");
+            throw new IllegalArgumentException("The track to be updated does not exist in the library.");
         }
         LinkedHashSet<Track> rebuilt = new LinkedHashSet<>();
         for (Track t : tracks)

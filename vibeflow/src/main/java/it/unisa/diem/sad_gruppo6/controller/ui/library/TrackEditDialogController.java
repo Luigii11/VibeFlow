@@ -65,7 +65,7 @@ public class TrackEditDialogController {
     @FXML
     private void handleBrowseFile(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleziona file audio");
+        fileChooser.setTitle("Select audio file");
         fileChooser.getExtensionFilters().add(
             new FileChooser.ExtensionFilter("File MP3", "*.mp3")
         );

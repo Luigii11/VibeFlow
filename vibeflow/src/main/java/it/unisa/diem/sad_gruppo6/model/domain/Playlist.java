@@ -45,7 +45,7 @@ public class Playlist {
      */
     public void setName(String name) {
         if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Il nome della playlist non può essere vuoto.");
+            throw new IllegalArgumentException("Playlist name can't be empty.");
         }
         this.name = name;
     }
