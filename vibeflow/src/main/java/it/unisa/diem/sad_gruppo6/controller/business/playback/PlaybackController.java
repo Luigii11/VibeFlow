@@ -181,23 +181,13 @@ public class PlaybackController {
 
         if (currentTrack != null) {
             if (currentTrack != previousTrack) {
-                // C'è un brano successivo
-                playbackService.start();
-                playbackService.setOnEndOfTrack(() -> onTrackEnded());
+                startPlayback(currentTrack);
             } else {
-                // La traccia è la stessa
                 boolean isLoop = playbackState.getMode() instanceof it.unisa.diem.sad_gruppo6.model.playback.strategies.LoopMode;
                 if (isLoop) {
-                    // Loop con 1 solo brano: Riavvia da zero
-                    if (playbackService != null) playbackService.stop();
-                    playbackService.start();
-                    playbackService.setOnEndOfTrack(() -> onTrackEnded());
+                    startPlayback(currentTrack);
                 }
             }
-        }
-
-        if ("Paused".equals(playbackState.getStatusName())) {
-            this.resume();
         }
     }
 
@@ -217,22 +207,13 @@ public class PlaybackController {
 
         if (currentTrack != null) {
             if (currentTrack != previousTrack) {
-                // C'è un brano precedente
-                playbackService.start();
-                playbackService.setOnEndOfTrack(() -> onTrackEnded());
+                startPlayback(currentTrack);
             } else {
-                // La traccia è la stessa
                 boolean isLoop = playbackState.getMode() instanceof it.unisa.diem.sad_gruppo6.model.playback.strategies.LoopMode;
                 if (isLoop || playbackState.getCurrentPosition() == 0) {
-                    if (playbackService != null) playbackService.stop();
-                    playbackService.start();
-                    playbackService.setOnEndOfTrack(() -> onTrackEnded());
+                    startPlayback(currentTrack);
                 }
             }
-        }
-
-        if ("Paused".equals(playbackState.getStatusName())) {
-            this.resume();
         }
     }
 

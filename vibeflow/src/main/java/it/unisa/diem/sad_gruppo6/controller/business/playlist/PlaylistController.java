@@ -185,9 +185,9 @@ public class PlaylistController {
         }
         AppCommand reorderCommand = new ReorderTrackCommand(p, t, newIndex);
         try {
-            CommandManager.getInstance().execute(reorderCommand);
+            this.commandManager.execute(reorderCommand);
         } catch (Exception e) {
-            CommandManager.getInstance().undo(); 
+            this.commandManager.undo(); 
             throw new Exception("Errore durante il salvataggio del nuovo ordine. L'operazione è stata annullata.", e);
         }
     }
