@@ -344,25 +344,24 @@ public class PlaylistController {
         if (year <= 0) {
                     return;
                 }
-                String yearName = String.valueOf(year);
-                Playlist existing = findAutoPlaylistByName(yearName);
-        
-                YearPlaylistCreator creator = new YearPlaylistCreator(year);
-                Playlist updated = creator.createPlaylist(trackLibrary.getTracks());
-        
-                if (existing == null) {
-                    if (updated != null) {
-                        playlistLibrary.addPlaylist(updated);
-                    }
-                } else {
-                    existing.getTracks().clear();
-                    if (updated != null) {
-                        for (Track t : updated.getTracks()) {
-                            existing.getTracks().add(t);
-                        }
-                    }
-                    playlistLibrary.updatePlaylist(existing);
+        YearPlaylistCreator creator = new YearPlaylistCreator(year);
+        String decadeName = creator.getDecadeName();
+        Playlist existing = findAutoPlaylistByName(decadeName);
+        Playlist updated = creator.createPlaylist(trackLibrary.getTracks());
+
+        if (existing == null) {
+            if (updated != null) {
+                playlistLibrary.addPlaylist(updated);
+            }
+        } else {
+            existing.getTracks().clear();
+            if (updated != null) {
+                for (Track t : updated.getTracks()) {
+                    existing.getTracks().add(t);
                 }
+            }
+            playlistLibrary.updatePlaylist(existing);
+        }
     }
 
     /**
@@ -377,12 +376,15 @@ public class PlaylistController {
         if (year <= 0) {
             return;
         }
-        String yearName = String.valueOf(year);
-        boolean yearStillPresent = trackLibrary.getTracks().stream()
-                .anyMatch(t -> t.getYear() == year);
- 
-        if (!yearStillPresent) {
-            Playlist toRemove = findAutoPlaylistByName(yearName);
+        YearPlaylistCreator creator = new YearPlaylistCreator(year);
+        int decadeStart = creator.getDecadeStart();
+        String decadeName = creator.getDecadeName();
+
+        boolean decadeStillPresent = trackLibrary.getTracks().stream()
+                .anyMatch(t -> t.getYear() >= decadeStart && t.getYear() <= decadeStart + 9);
+
+        if (!decadeStillPresent) {
+            Playlist toRemove = findAutoPlaylistByName(decadeName);
             if (toRemove != null) {
                 playlistLibrary.removePlaylist(toRemove);
             }
