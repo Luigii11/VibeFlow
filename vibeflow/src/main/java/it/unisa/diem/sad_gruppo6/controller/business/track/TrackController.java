@@ -109,15 +109,22 @@ public class TrackController
         commandManager.execute(command);
 
         if (!oldGenre.equalsIgnoreCase(genre)) {
-        playlistController.removeGenrePlaylistIfEmpty(oldGenre);
+            playlistController.createAutoPlaylist(oldGenre);
+            playlistController.removeGenrePlaylistIfEmpty(oldGenre);
         }
 
         playlistController.createAutoPlaylist(genre);
 
         if (oldYear != year) {
-        playlistController.removeYearPlaylistIfEmpty(oldYear);
+          playlistController.createAutoPlaylist(oldYear);
+          playlistController.removeYearPlaylistIfEmpty(oldYear);
         }
         playlistController.createAutoPlaylist(year);
+
+
+        PlaylistLibrary.getInstance().updatePlaylist(null);
+
+        
 
         
     }
