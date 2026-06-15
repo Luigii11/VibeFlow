@@ -411,7 +411,7 @@ public class HomeController implements PlaylistLibraryObserver {
      */
     @FXML
     private void handleShowFavourites(ActionEvent event) {
-        TagPlaylistCreator creator = new TagPlaylistCreator(Tag.FAVOURITE);
+        TagPlaylistCreator creator = new TagPlaylistCreator(Tag.Favourite);
         Playlist favourites = creator.createPlaylist(TrackLibrary.getInstance().getTracks());
 
         if (favourites == null) {

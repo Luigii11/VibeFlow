@@ -69,7 +69,7 @@ public class TrackController
         playlistController.createAutoPlaylist(year);
 
         for (Tag t : track.getTagSet().getTags()) {
-            if (t != Tag.FAVOURITE) {
+            if (t != Tag.Favourite) {
                 playlistController.createAutoPlaylist(t);
             }
         }
@@ -90,11 +90,11 @@ public class TrackController
     {
         if (explicit)
         {
-            track.getTagSet().setSystemTag(Tag.EXPLICIT);
+            track.getTagSet().setSystemTag(Tag.Explicit);
         }
         if (track.getYear() == LocalDate.now().getYear())
         {
-            track.getTagSet().setSystemTag(Tag.NEW_RELEASE);
+            track.getTagSet().setSystemTag(Tag.NewRelease);
         }
     }
 
@@ -106,8 +106,8 @@ public class TrackController
         int length = AudioMetadataExtractor.extractDuration(path);
         Track updatedTrack = new Track(title, author, length, genre, year, path);
         
-        if (target.getTagSet().hasTag(Tag.FAVOURITE)) {
-            updatedTrack.getTagSet().addTag(Tag.FAVOURITE);
+        if (target.getTagSet().hasTag(Tag.Favourite)) {
+            updatedTrack.getTagSet().addTag(Tag.Favourite);
         }
         assignSystemTags(updatedTrack, RANDOM.nextBoolean());
         EditTrackCommand command = new EditTrackCommand(target, updatedTrack);
@@ -119,10 +119,10 @@ public class TrackController
         }
 
         playlistController.createAutoPlaylist(genre);
-        playlistController.createAutoPlaylist(Tag.EXPLICIT);
-        playlistController.removeTagPlaylistIfEmpty(Tag.EXPLICIT);
-        playlistController.createAutoPlaylist(Tag.NEW_RELEASE);
-        playlistController.removeTagPlaylistIfEmpty(Tag.NEW_RELEASE);
+        playlistController.createAutoPlaylist(Tag.Explicit);
+        playlistController.removeTagPlaylistIfEmpty(Tag.Explicit);
+        playlistController.createAutoPlaylist(Tag.NewRelease);
+        playlistController.removeTagPlaylistIfEmpty(Tag.NewRelease);
 
         if (oldYear != year) {
           playlistController.createAutoPlaylist(oldYear);
@@ -163,7 +163,7 @@ public class TrackController
         playlistController.createAutoMostPlayedPlaylist();
 
         for (Tag t : track.getTagSet().getTags()) {
-            if (t != Tag.FAVOURITE) {
+            if (t != Tag.Favourite) {
                 playlistController.createAutoPlaylist(t);
                 playlistController.removeTagPlaylistIfEmpty(t);
             }
@@ -190,7 +190,7 @@ public class TrackController
         track.getTagSet().addTag(tag);
         library.notifyTrackUpdated(track);
 
-        if (tag != Tag.FAVOURITE) {
+        if (tag != Tag.Favourite) {
             playlistController.createAutoPlaylist(tag);
         }
     }
@@ -227,7 +227,7 @@ public class TrackController
         track.getTagSet().removeTag(tag);
         library.notifyTrackUpdated(track);
 
-        if (tag != Tag.FAVOURITE) {
+        if (tag != Tag.Favourite) {
             playlistController.createAutoPlaylist(tag);
             playlistController.removeTagPlaylistIfEmpty(tag);
         }

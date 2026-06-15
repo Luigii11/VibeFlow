@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class MostPlayedPlaylistCreator extends PlaylistCreator {
 
-    public static final String PLAYLIST_NAME = "Most_played";
+    public static final String PLAYLIST_NAME = "Most Played";
 
     /**
      * @brief Crea una playlist con le tracce ordinate per numero di riproduzioni decrescente.

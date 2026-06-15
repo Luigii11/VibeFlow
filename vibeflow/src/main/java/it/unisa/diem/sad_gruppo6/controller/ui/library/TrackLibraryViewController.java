@@ -194,26 +194,26 @@ public class TrackLibraryViewController implements TrackLibraryObserver {
         HBox box = new HBox(6);
         box.setAlignment(Pos.CENTER_LEFT);
 
-        Label favIcon = new Label(track.getTagSet().hasTag(Tag.FAVOURITE) ? "♥" : "♡");
+        Label favIcon = new Label(track.getTagSet().hasTag(Tag.Favourite) ? "♥" : "♡");
         favIcon.setStyle("-fx-font-size: 14px; -fx-cursor: hand; -fx-text-fill: #FF4C30;");
         favIcon.setOnMouseClicked(e -> {
-            if (track.getTagSet().hasTag(Tag.FAVOURITE)) {
-                trackController.removeTag(track, Tag.FAVOURITE);
+            if (track.getTagSet().hasTag(Tag.Favourite)) {
+                trackController.removeTag(track, Tag.Favourite);
             } else {
-                trackController.addTag(track, Tag.FAVOURITE);
+                trackController.addTag(track, Tag.Favourite);
             }
             e.consume();
         });
         box.getChildren().add(favIcon);
 
-        if (track.getTagSet().hasTag(Tag.EXPLICIT)) {
+        if (track.getTagSet().hasTag(Tag.Explicit)) {
             Label explicitIcon = new Label("E");
             explicitIcon.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF; "
                     + "-fx-background-color: #888888; -fx-padding: 1 4 1 4; -fx-background-radius: 3;");
             box.getChildren().add(explicitIcon);
         }
 
-        if (track.getTagSet().hasTag(Tag.NEW_RELEASE)) {
+        if (track.getTagSet().hasTag(Tag.NewRelease)) {
             Label newIcon = new Label("NEW");
             newIcon.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF; "
                     + "-fx-background-color: #5E27BF; -fx-padding: 1 4 1 4; -fx-background-radius: 3;");

@@ -293,18 +293,18 @@ public class MediaPlayerController implements PlaybackObserver {
         if (trackTagsBox == null) return;
         trackTagsBox.getChildren().clear();
 
-        if (track.getTagSet().hasTag(Tag.FAVOURITE)) {
+        if (track.getTagSet().hasTag(Tag.Favourite)) {
             Label fav = new Label("♥");
             fav.setStyle("-fx-font-size: 12px; -fx-text-fill: #FF4C30;");
             trackTagsBox.getChildren().add(fav);
         }
-        if (track.getTagSet().hasTag(Tag.EXPLICIT)) {
+        if (track.getTagSet().hasTag(Tag.Explicit)) {
             Label explicit = new Label("E");
             explicit.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF; "
                     + "-fx-background-color: #888888; -fx-padding: 0 4 0 4; -fx-background-radius: 3;");
             trackTagsBox.getChildren().add(explicit);
         }
-        if (track.getTagSet().hasTag(Tag.NEW_RELEASE)) {
+        if (track.getTagSet().hasTag(Tag.NewRelease)) {
             Label newRel = new Label("NEW");
             newRel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF; "
                     + "-fx-background-color: #5E27BF; -fx-padding: 0 4 0 4; -fx-background-radius: 3;");

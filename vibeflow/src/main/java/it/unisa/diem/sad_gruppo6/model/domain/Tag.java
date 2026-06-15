@@ -13,13 +13,13 @@ package it.unisa.diem.sad_gruppo6.model.domain;
 public enum Tag
 {
     /** Traccia preferita, assegnabile/rimovibile manualmente dall'utente. */
-    FAVOURITE(false),
+    Favourite(false),
 
     /** Traccia con contenuto esplicito, assegnata automaticamente dal sistema. */
-    EXPLICIT(true),
+    Explicit(true),
 
     /** Traccia pubblicata nell'anno corrente, assegnata automaticamente dal sistema. */
-    NEW_RELEASE(true);
+    NewRelease(true);
 
     private final boolean systemAssigned;
 

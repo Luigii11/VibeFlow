@@ -75,13 +75,16 @@ public class RemoveTrackFromLibraryCommand implements AppCommand
      */
     @Override
     public void undo() {
-        // Ripristina la traccia in ogni playlist nella posizione originale
+        library.addTrackAtIndex(track, originalIndex);
         for (Map.Entry<Playlist, Integer> entry : originalPlaylistPositions.entrySet()) {
             Playlist p = entry.getKey();
             int safeIndex = Math.max(0, Math.min(entry.getValue(), p.getTracks().size()));
             p.getTracks().add(safeIndex, track);
-            playlistLibrary.updatePlaylist(p);
+            if (!playlistLibrary.getPlaylists().contains(p)) {
+                playlistLibrary.addPlaylist(p);
+            } else {
+                playlistLibrary.updatePlaylist(p);
+            }
         }
-       library.addTrackAtIndex(track, originalIndex);
     }
 }
