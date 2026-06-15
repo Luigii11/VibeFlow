@@ -149,12 +149,20 @@ public class Track
 
     /**
      * Getter del numero di riproduzioni della traccia
-     * 
+     *
      * @return Il numero di volte che la traccia è stata riprodotta.
      */
-    public int getPlayCount() 
+    public int getPlayCount()
     {
         return playCount;
+    }
+
+    /**
+     * Incrementa di uno il contatore di riproduzioni della traccia.
+     */
+    public void incrementPlayCount()
+    {
+        this.playCount++;
     }
 
     /**

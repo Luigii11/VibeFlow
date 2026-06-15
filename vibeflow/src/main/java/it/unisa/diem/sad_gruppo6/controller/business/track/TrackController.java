@@ -142,6 +142,8 @@ public class TrackController
         commandManager.execute(command);
         playlistController.removeGenrePlaylistIfEmpty(genre);
         playlistController.removeYearPlaylistIfEmpty(year);
+        playlistController.removeTopPlayedPlaylistIfEmpty();
+        playlistController.createAutoMostPlayedPlaylist();
     }
 
     /**
@@ -167,6 +169,18 @@ public class TrackController
         if (tag != Tag.FAVOURITE) {
             playlistController.createAutoPlaylist(tag);
         }
+    }
+
+    /**
+     * @brief Incrementa il playCount della traccia e aggiorna la playlist "Most_played".
+     *
+     * @param track La traccia appena terminata di riprodurre.
+     */
+    public void incrementPlayCount(Track track) {
+        if (track == null) return;
+        track.incrementPlayCount();
+        library.notifyTrackUpdated(track);
+        playlistController.createAutoMostPlayedPlaylist();
     }
 
     /**

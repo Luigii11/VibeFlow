@@ -22,6 +22,7 @@ import it.unisa.diem.sad_gruppo6.model.factory.GenrePlaylistCreator;
 import it.unisa.diem.sad_gruppo6.model.factory.YearPlaylistCreator;
 import it.unisa.diem.sad_gruppo6.model.domain.Tag;
 import it.unisa.diem.sad_gruppo6.model.factory.TagPlaylistCreator;
+import it.unisa.diem.sad_gruppo6.model.factory.MostPlayedPlaylistCreator;
 
 public class PlaylistController {
 
@@ -390,6 +391,57 @@ public class PlaylistController {
     }
     
 
+
+    /**
+     * @brief Crea o aggiorna la playlist automatica "Most_played" con le tracce più riprodotte.
+     *
+     * @details Invoca MostPlayedPlaylistCreator per produrre una playlist ordinata per
+     *          playCount decrescente (solo tracce con almeno una riproduzione).
+     *          - Se non esiste: la aggiunge alla PlaylistLibrary.
+     *          - Se esiste già: ne sostituisce il contenuto e notifica gli observer.
+     *          Se il creator restituisce null (nessuna traccia riprodotta) e la playlist
+     *          non esiste, non viene creato nulla. Se esiste e il creator restituisce null,
+     *          la playlist viene svuotata ma mantenuta (sarà rimossa da removeTopPlayedIfEmpty).
+     */
+    public void createAutoMostPlayedPlaylist() {
+        Playlist existing = findAutoPlaylistByName(MostPlayedPlaylistCreator.PLAYLIST_NAME);
+
+        MostPlayedPlaylistCreator creator = new MostPlayedPlaylistCreator();
+        Playlist updated = creator.createPlaylist(trackLibrary.getTracks());
+
+        if (existing == null) {
+            if (updated != null) {
+                playlistLibrary.addPlaylist(updated);
+            }
+        } else {
+            existing.getTracks().clear();
+            if (updated != null) {
+                for (Track t : updated.getTracks()) {
+                    existing.getTracks().add(t);
+                }
+            }
+            playlistLibrary.updatePlaylist(existing);
+        }
+    }
+
+    /**
+     * @brief Rimuove la playlist "Most_played" se nessuna traccia ha ancora riproduzioni.
+     *
+     * @details Chiamato dopo la cancellazione di una traccia dalla libreria, per verificare
+     *          se rimangono ancora tracce con playCount > 0. Se non ne rimane nessuna,
+     *          elimina la playlist autogenerata.
+     */
+    public void removeTopPlayedPlaylistIfEmpty() {
+        boolean anyPlayed = trackLibrary.getTracks().stream()
+                .anyMatch(t -> t.getPlayCount() > 0);
+
+        if (!anyPlayed) {
+            Playlist toRemove = findAutoPlaylistByName(MostPlayedPlaylistCreator.PLAYLIST_NAME);
+            if (toRemove != null) {
+                playlistLibrary.removePlaylist(toRemove);
+            }
+        }
+    }
 
     /**
      * @brief Cerca nella PlaylistLibrary una playlist autogenerata con il nome specificato.
