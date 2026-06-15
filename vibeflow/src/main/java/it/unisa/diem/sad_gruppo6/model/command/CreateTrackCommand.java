@@ -1,0 +1,130 @@
+/**
+ * @file CreateTrackCommand.java
+ * Comando che incapsula l'intera operazione di creazione di una traccia:
+ * aggiunta alla TrackLibrary e aggiornamento delle playlist automatiche
+ * (genere, decade, tag). L'undo inverte entrambe le fasi in modo atomico.
+ *
+ * @pattern Command
+ *
+ * @see AppCommand
+ * @see TrackLibrary
+ * @see PlaylistLibrary
+ *
+ * @author EmanuelChirico
+ */
+package it.unisa.diem.sad_gruppo6.model.command;
+
+import java.util.function.Predicate;
+
+import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
+import it.unisa.diem.sad_gruppo6.model.domain.Tag;
+import it.unisa.diem.sad_gruppo6.model.domain.Track;
+import it.unisa.diem.sad_gruppo6.model.factory.GenrePlaylistCreator;
+import it.unisa.diem.sad_gruppo6.model.factory.MostPlayedPlaylistCreator;
+import it.unisa.diem.sad_gruppo6.model.factory.PlaylistCreator;
+import it.unisa.diem.sad_gruppo6.model.factory.TagPlaylistCreator;
+import it.unisa.diem.sad_gruppo6.model.factory.YearPlaylistCreator;
+import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibrary;
+import it.unisa.diem.sad_gruppo6.model.library.TrackLibrary;
+import it.unisa.diem.sad_gruppo6.model.playback.states.PausedState;
+import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
+import it.unisa.diem.sad_gruppo6.model.service.PlaybackService;
+
+public class CreateTrackCommand implements AppCommand {
+
+    private final TrackLibrary library;
+    private final PlaylistLibrary playlistLibrary;
+    private final Track track;
+
+    public CreateTrackCommand(TrackLibrary library, PlaylistLibrary playlistLibrary, Track track) {
+        this.library = library;
+        this.playlistLibrary = playlistLibrary;
+        this.track = track;
+    }
+
+    @Override
+    public void execute() {
+        library.addTrack(track);
+        refreshAutoPlaylists();
+    }
+
+    @Override
+    public void undo() {
+        PlaybackState state = PlaybackState.getInstance();
+        if (track.equals(state.getCurrentTrack())) {
+            PlaybackService.getInstance().stop();
+            state.setCurrentTrack(null);
+            state.seekTo(0);
+            state.changeState(new PausedState());
+        }
+        library.removeTrack(track);
+        cleanupAutoPlaylists();
+    }
+
+    private void refreshAutoPlaylists() {
+        applyAutoPlaylist(new GenrePlaylistCreator(track.getGenre()), track.getGenre());
+        YearPlaylistCreator yearCreator = new YearPlaylistCreator(track.getYear());
+        applyAutoPlaylist(yearCreator, yearCreator.getDecadeName());
+        for (Tag t : track.getTagSet().getTags()) {
+            if (t != Tag.Favourite) {
+                applyAutoPlaylist(new TagPlaylistCreator(t), t.name());
+            }
+        }
+    }
+
+    private void cleanupAutoPlaylists() {
+        applyAutoPlaylist(new GenrePlaylistCreator(track.getGenre()), track.getGenre());
+        removePlaylistIfNoMatch(track.getGenre(),
+                t -> track.getGenre().equalsIgnoreCase(t.getGenre()));
+
+        YearPlaylistCreator yearCreator = new YearPlaylistCreator(track.getYear());
+        applyAutoPlaylist(yearCreator, yearCreator.getDecadeName());
+        int decadeStart = yearCreator.getDecadeStart();
+        removePlaylistIfNoMatch(yearCreator.getDecadeName(),
+                t -> t.getYear() >= decadeStart && t.getYear() <= decadeStart + 9);
+
+        for (Tag tag : track.getTagSet().getTags()) {
+            if (tag != Tag.Favourite) {
+                applyAutoPlaylist(new TagPlaylistCreator(tag), tag.name());
+                removePlaylistIfNoMatch(tag.name(), t -> t.getTagSet().hasTag(tag));
+            }
+        }
+        applyAutoPlaylist(new MostPlayedPlaylistCreator(), MostPlayedPlaylistCreator.PLAYLIST_NAME);
+        removePlaylistIfNoMatch(MostPlayedPlaylistCreator.PLAYLIST_NAME, t -> t.getPlayCount() > 0);
+    }
+
+    private void applyAutoPlaylist(PlaylistCreator creator, String name) {
+        Playlist existing = findAutoPlaylistByName(name);
+        Playlist updated = creator.createPlaylist(library.getTracks());
+        if (existing == null) {
+            if (updated != null) {
+                playlistLibrary.addPlaylist(updated);
+            }
+        } else {
+            existing.getTracks().clear();
+            if (updated != null) {
+                existing.getTracks().addAll(updated.getTracks());
+            }
+            playlistLibrary.updatePlaylist(existing);
+        }
+    }
+
+    private void removePlaylistIfNoMatch(String name, Predicate<Track> stillPresent) {
+        boolean anyMatch = library.getTracks().stream().anyMatch(stillPresent);
+        if (!anyMatch) {
+            Playlist toRemove = findAutoPlaylistByName(name);
+            if (toRemove != null) {
+                playlistLibrary.removePlaylist(toRemove);
+            }
+        }
+    }
+
+    private Playlist findAutoPlaylistByName(String name) {
+        for (Playlist p : playlistLibrary.getPlaylists()) {
+            if (p.isAutoGenerated() && p.getName().equalsIgnoreCase(name)) {
+                return p;
+            }
+        }
+        return null;
+    }
+}

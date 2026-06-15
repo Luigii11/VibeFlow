@@ -17,6 +17,9 @@ package it.unisa.diem.sad_gruppo6.model.command;
 import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
 import it.unisa.diem.sad_gruppo6.model.domain.Track;
 import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibrary;
+import it.unisa.diem.sad_gruppo6.model.playback.states.PausedState;
+import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
+import it.unisa.diem.sad_gruppo6.model.service.PlaybackService;
 
 public class AddTrackToPlaylistCommand implements AppCommand {
 
@@ -51,6 +54,14 @@ public class AddTrackToPlaylistCommand implements AppCommand {
      */
     @Override
     public void undo(){
+        PlaybackState playbackState = PlaybackState.getInstance();
+        if (track.equals(playbackState.getCurrentTrack()) &&
+                playlist.equals(playbackState.getCurrentPlaylist())) {
+            PlaybackService.getInstance().stop();
+            playbackState.setCurrentTrack(null);
+            playbackState.seekTo(0);
+            playbackState.changeState(new PausedState());
+        }
         playlist.removeTrack(track);
         PlaylistLibrary.getInstance().updatePlaylist(playlist);
     }

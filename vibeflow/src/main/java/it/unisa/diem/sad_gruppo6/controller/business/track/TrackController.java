@@ -10,7 +10,7 @@ package it.unisa.diem.sad_gruppo6.controller.business.track;
 import java.time.LocalDate;
 
 import it.unisa.diem.sad_gruppo6.controller.business.playlist.PlaylistController;
-import it.unisa.diem.sad_gruppo6.model.command.AddTrackToLibraryCommand;
+import it.unisa.diem.sad_gruppo6.model.command.CreateTrackCommand;
 import it.unisa.diem.sad_gruppo6.model.command.CommandManager;
 import it.unisa.diem.sad_gruppo6.model.command.EditTrackCommand;
 import it.unisa.diem.sad_gruppo6.model.command.RemoveTrackFromLibraryCommand;
@@ -63,16 +63,8 @@ public class TrackController
         boolean explicit = RANDOM.nextBoolean();
         assignSystemTags(track, explicit);
 
-        AddTrackToLibraryCommand command = new AddTrackToLibraryCommand(library, track);
+        CreateTrackCommand command = new CreateTrackCommand(library, PlaylistLibrary.getInstance(), track);
         commandManager.execute(command);
-        playlistController.createAutoPlaylist(genre);
-        playlistController.createAutoPlaylist(year);
-
-        for (Tag t : track.getTagSet().getTags()) {
-            if (t != Tag.Favourite) {
-                playlistController.createAutoPlaylist(t);
-            }
-        }
     }
 
     /**

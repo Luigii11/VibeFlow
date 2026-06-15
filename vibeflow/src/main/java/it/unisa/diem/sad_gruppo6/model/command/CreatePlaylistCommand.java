@@ -11,6 +11,9 @@ package it.unisa.diem.sad_gruppo6.model.command;
 
 import it.unisa.diem.sad_gruppo6.model.domain.Playlist;
 import it.unisa.diem.sad_gruppo6.model.library.PlaylistLibrary;
+import it.unisa.diem.sad_gruppo6.model.playback.states.PausedState;
+import it.unisa.diem.sad_gruppo6.model.playback.states.PlaybackState;
+import it.unisa.diem.sad_gruppo6.model.service.PlaybackService;
 
 public class CreatePlaylistCommand implements AppCommand {
 
@@ -36,13 +39,17 @@ public class CreatePlaylistCommand implements AppCommand {
     }
      
      /**
-     * Operazione di undo non supportata per questo comando.
-     * @throws UnsupportedOperationException Per segnalare che questa operazione non è stata ancora implementata.
+     * Annulla il comando rimuovendo la playlist dalla libreria e fermando la riproduzione se era in corso su di essa.
      */
     @Override
     public void undo() {
-        throw new UnsupportedOperationException(
-            "Undo not supported for " + this.getClass().getSimpleName()
-        );
+        PlaybackState playbackState = PlaybackState.getInstance();
+        if (playlistToAdd.equals(playbackState.getCurrentPlaylist())) {
+            PlaybackService.getInstance().stop();
+            playbackState.setCurrentTrack(null);
+            playbackState.seekTo(0);
+            playbackState.changeState(new PausedState());
+        }
+        playlistLibrary.removePlaylist(playlistToAdd);
     }
 }
