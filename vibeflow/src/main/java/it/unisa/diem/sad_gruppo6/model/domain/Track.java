@@ -134,7 +134,7 @@ public class Track
      * Setter dell'anno di pubblicazione della traccia, con controllo di validità sull'input.
      * 
      * @param year Anno di uscita della traccia.
-     * @throws IllegalArgumentException Se l'anno di pubblicazione è inferiore al 1970 o superiore all'anno corrente.
+     * @throws IllegalArgumentException Se l'anno di pubblicazione è inferiore al 1900 o superiore all'anno corrente.
      */
 
     public void setYear(int year) 
@@ -142,7 +142,7 @@ public class Track
         int currentYear = LocalDate.now().getYear();
         if (year < 1900 || year > currentYear) 
         {
-            throw new IllegalArgumentException("L'anno di pubblicazione deve essere compreso tra 1970 e " + currentYear + ".");
+            throw new IllegalArgumentException("L'anno di pubblicazione deve essere compreso tra 1900 e " + currentYear + ".");
         }
         this.year = year;
     }
