@@ -74,12 +74,7 @@ mvn javafx:run
 
 Università degli Studi di Salerno — DIEM
 
-| Cognome  | Nome     |
-| -------- | -------- |
-| Autorino | Luigi    |
-| Chirico  | Emanuel  |
-| Crisci   | Chiara   |
-| Graziuso | Emanuela |
+**Autori:** Autorino Luigi · Chirico Emanuel · Crisci Chiara · Graziuso Emanuela
 
 **Docenti:** Andrea Apicella · Pierluigi Ritrovato
 
